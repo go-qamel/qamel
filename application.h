@@ -22,7 +22,7 @@ void App_SetApplicationName(void* ptr, char* name);
 void App_SetApplicationVersion(void* ptr, char* version);
 void App_SetOrganizationName(void* ptr, char* name);
 void App_SetOrganizationDomain(void* ptr, char* domain);
-int App_Exec();
+int App_Exec(void* ptr);
 
 #ifdef __cplusplus
 }

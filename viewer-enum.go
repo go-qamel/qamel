@@ -1,4 +1,4 @@
-package viewer
+package qamel
 
 // ResizeMode specifies how to resize the view.
 type ResizeMode int

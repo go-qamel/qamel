@@ -56,6 +56,7 @@ void App_SetOrganizationDomain(void* ptr, char* domain) {
     app->setOrganizationDomain(QString(domain));
 }
 
-int App_Exec() {
-    return QGuiApplication::exec();
+int App_Exec(void* ptr) {
+    QGuiApplication *app = static_cast<QGuiApplication*>(ptr);
+    return app->exec();
 }

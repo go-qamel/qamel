@@ -1,4 +1,4 @@
-package application
+package qamel
 
 // FontWeight is the weight for thickness of the font.
 // Qt uses a weighting scale from 0 to 99 similar to,

@@ -1,4 +1,4 @@
-package viewer
+package qamel
 
 // #include <stdlib.h>
 // #include <stdbool.h>

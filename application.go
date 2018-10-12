@@ -1,4 +1,4 @@
-package application
+package qamel
 
 // #include <stdlib.h>
 // #include <stdbool.h>
@@ -122,7 +122,7 @@ func (app Application) SetOrganizationDomain(domain string) {
 // then returns the value that was set to exit() (which is 0 if exit() is
 // called via quit()).
 func (app Application) Exec() int {
-	return int(int32(C.App_Exec()))
+	return int(int32(C.App_Exec(app.ptr)))
 }
 
 func sliceToChars(src []string) **C.char {
