@@ -3,6 +3,7 @@
 
 # Exclude generated file
 cgo.go
+moc*.h
 
 # Exclude sample dir
 sample/

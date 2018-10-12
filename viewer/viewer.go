@@ -255,3 +255,12 @@ func (view Viewer) ClearComponentCache() {
 
 	C.Viewer_ClearComponentCache(view.ptr)
 }
+
+// Reload reloads the active QML view.
+func (view Viewer) Reload() {
+	if view.ptr == nil {
+		return
+	}
+
+	C.Viewer_Reload(view.ptr)
+}

@@ -4,6 +4,10 @@
 #define QAMEL_VIEWER_H
 
 #ifdef __cplusplus
+
+// Class
+class QamelView;
+
 extern "C" {
 #endif
 
@@ -33,6 +37,7 @@ void Viewer_ShowFullScreen(void* ptr);
 void Viewer_ShowNormal(void* ptr);
 void Viewer_SetWindowStates(void* ptr, int state);
 void Viewer_ClearComponentCache(void* ptr);
+void Viewer_Reload(void* ptr);
 
 #ifdef __cplusplus
 }
