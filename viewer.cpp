@@ -139,4 +139,4 @@ void Viewer_Reload(void* ptr) {
     QMetaObject::invokeMethod(static_cast<QamelView*>(ptr), "reload");
 }
 
-#include "moc.h"
+#include "moc-viewer.h"

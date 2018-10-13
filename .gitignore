@@ -2,8 +2,9 @@
 .vscode/
 
 # Exclude generated file
-cgo.go
+cgo*.go
 moc*.h
+qamel/qamel*
 
 # Exclude sample dir
 sample/
