@@ -106,7 +106,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 
 	// Generating cgo code for binding
 	fmt.Println()
-	fmt.Println("Generating some code for binding. Please wait for a while...")
+	fmt.Println("Generating some code for binding...")
 
 	gen := Generator{
 		Qmake: qmakePath,
@@ -133,6 +133,21 @@ func setupHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	cGreen.Println("Done")
+
+	// Save generator as JSON in config file
+	fmt.Println()
+	fmt.Println("Saving config file...")
+
+	err = gen.SaveToFile()
+	if err != nil {
+		cRedBold.Println("Failed to save the config file:", err)
+		return
+	}
+
+	cGreen.Println("Done")
+
+	// Setup finished
 	fmt.Println()
 	cGreenBold.Println("Setup finished.")
 	cGreenBold.Println("Now you can get started on your own QML app.")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -161,4 +162,20 @@ func (gen Generator) CreateMocFile(src string, dst string) error {
 	// Run moc
 	cmdMoc := exec.Command(gen.Moc, "-o", dst, src)
 	return cmdMoc.Run()
+}
+
+// SaveToFile saves the generator as JSON in ${XDG_CONFIG_HOME}/qamel/config
+func (gen Generator) SaveToFile() error {
+	// Make sure config dir is exists
+	os.MkdirAll(fp.Dir(configPath), os.ModePerm)
+
+	// Create file
+	configFile, err := os.Create(configPath)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+
+	// Encode generator to JSON
+	return json.NewEncoder(configFile).Encode(&gen)
 }
