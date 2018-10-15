@@ -19,6 +19,7 @@ var (
 	cGreen     = color.New(color.FgGreen)
 	cGreenBold = color.New(color.FgGreen, color.Bold)
 	cBlueBold  = color.New(color.FgBlue, color.Bold)
+	cYellow    = color.New(color.FgYellow)
 )
 
 // fileExists checks if the file in specified path is exists

@@ -24,6 +24,37 @@ type Generator struct {
 	Rcc   string
 }
 
+// LoadGenerator loads the generator from config file in ${XDG_CONFIG_HOME}/qamel/config
+func LoadGenerator() (Generator, error) {
+	// Open file
+	configFile, err := os.Open(configPath)
+	if err != nil {
+		return Generator{}, err
+	}
+	defer configFile.Close()
+
+	// Decode JSON to generator
+	gen := Generator{}
+	err = json.NewDecoder(configFile).Decode(&gen)
+	return gen, err
+}
+
+// SaveToFile saves the generator as JSON in ${XDG_CONFIG_HOME}/qamel/config
+func (gen Generator) SaveToFile() error {
+	// Make sure config dir is exists
+	os.MkdirAll(fp.Dir(configPath), os.ModePerm)
+
+	// Create file
+	configFile, err := os.Create(configPath)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+
+	// Encode generator to JSON
+	return json.NewEncoder(configFile).Encode(&gen)
+}
+
 // CreateCgoFlags creates cgo flags by using qmake
 func (gen Generator) CreateCgoFlags() (string, error) {
 	// Get temp dir
@@ -164,18 +195,58 @@ func (gen Generator) CreateMocFile(src string, dst string) error {
 	return cmdMoc.Run()
 }
 
-// SaveToFile saves the generator as JSON in ${XDG_CONFIG_HOME}/qamel/config
-func (gen Generator) SaveToFile() error {
-	// Make sure config dir is exists
-	os.MkdirAll(fp.Dir(configPath), os.ModePerm)
+// CreateRccFile creates rcc.cpp file from resource directory at `dstDir/res`
+func (gen Generator) CreateRccFile(dstDir string) error {
+	// Check if resource directory is exist
+	resDir := fp.Join(dstDir, "res")
+	if !dirExists(resDir) {
+		return fmt.Errorf("resource directory doesn't exist")
+	}
 
-	// Create file
-	configFile, err := os.Create(configPath)
+	// Get list of file inside resource dir
+	resFiles := []string{}
+	fp.Walk(resDir, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		path, _ = fp.Rel(dstDir, path)
+		resFiles = append(resFiles, path)
+		return nil
+	})
+
+	if len(resFiles) == 0 {
+		return fmt.Errorf("no resource available")
+	}
+
+	// Create temp qrc file
+	qrcPath := fp.Join(dstDir, "qamel.qrc")
+	qrcFile, err := os.Create(qrcPath)
 	if err != nil {
 		return err
 	}
-	defer configFile.Close()
 
-	// Encode generator to JSON
-	return json.NewEncoder(configFile).Encode(&gen)
+	defer func() {
+		qrcFile.Close()
+		os.Remove(qrcPath)
+	}()
+
+	qrcContent := fmt.Sprintln(`<!DOCTYPE RCC><RCC version="1.0">`)
+	qrcContent += fmt.Sprintln(`<qresource>`)
+	for _, resFile := range resFiles {
+		qrcContent += fmt.Sprintf("<file>%s</file>\n", resFile)
+	}
+	qrcContent += fmt.Sprintln(`</qresource>`)
+	qrcContent += fmt.Sprintln(`</RCC>`)
+
+	_, err = qrcFile.WriteString(qrcContent)
+	if err != nil {
+		return err
+	}
+	qrcFile.Sync()
+
+	// Run rcc
+	dst := fp.Join(dstDir, "rcc.cpp")
+	cmdRcc := exec.Command(gen.Rcc, "-o", dst, qrcPath)
+	return cmdRcc.Run()
 }
