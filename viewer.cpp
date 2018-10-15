@@ -4,6 +4,7 @@
 #include <QWindow>
 #include <QIcon>
 #include <QQmlEngine>
+#include <QMetaObject>
 #include "viewer.h"
 
 class QamelView : public QQuickView {
@@ -31,7 +32,7 @@ void* Viewer_NewViewerWithSource(char* source) {
 
 void Viewer_SetSource(void* ptr, char* url) {
     QamelView *view = static_cast<QamelView*>(ptr);
-    view->setSource(QUrl(QString(url)));
+    QMetaObject::invokeMethod(view, "setSource", Q_ARG(QUrl, QUrl(QString(url))));
 }
 
 void Viewer_SetResizeMode(void* ptr, int resizeMode) {
