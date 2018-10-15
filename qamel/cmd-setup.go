@@ -22,7 +22,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	reader := bufio.NewReader(os.Stdin)
 
 	// Fetch path to Qt's directory and tools
-	cGreenBold.Println("Thanks for using qamel, QML's binding for Go.")
+	cBlueBold.Println("Thanks for using qamel, QML's binding for Go.")
 	fmt.Println()
 	fmt.Println("Please specify the *full path* to your Qt's tools directory.")
 	fmt.Println("This might be different depending on your platform. " +
@@ -30,7 +30,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 		"the tools are located in $HOME/Qt5.11.1/5.11.1/gcc_64/bin/")
 	fmt.Println()
 
-	cBold.Print("Qt tools dir : ")
+	cCyanBold.Print("Qt tools dir : ")
 	qtDir, _ := reader.ReadString('\n')
 	qtDir = strings.TrimSpace(qtDir)
 	if !dirExists(qtDir) {
@@ -47,21 +47,21 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	mocExists := fileExists(mocPath)
 	rccExists := fileExists(rccPath)
 
-	cBold.Print("qmake        : ")
+	cCyanBold.Print("qmake        : ")
 	if qmakeExists {
 		cGreen.Println("found")
 	} else {
 		cRed.Println("not found")
 	}
 
-	cBold.Print("moc          : ")
+	cCyanBold.Print("moc          : ")
 	if mocExists {
 		cGreen.Println("found")
 	} else {
 		cRed.Println("not found")
 	}
 
-	cBold.Print("rcc          : ")
+	cCyanBold.Print("rcc          : ")
 	if rccExists {
 		cGreen.Println("found")
 	} else {
@@ -74,7 +74,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 		fmt.Println()
 
 		if !qmakeExists {
-			cBold.Print("Path to qmake : ")
+			cCyanBold.Print("Path to qmake : ")
 			qmakePath, _ = reader.ReadString('\n')
 			qmakePath = strings.TrimSpace(qmakePath)
 			if !fileExists(qmakePath) {
@@ -84,7 +84,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 		}
 
 		if !mocExists {
-			cBold.Print("Path to moc   : ")
+			cCyanBold.Print("Path to moc   : ")
 			mocPath, _ = reader.ReadString('\n')
 			mocPath = strings.TrimSpace(mocPath)
 			if !fileExists(mocPath) {
@@ -94,7 +94,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 		}
 
 		if !rccExists {
-			cBold.Print("Path to rcc   : ")
+			cCyanBold.Print("Path to rcc   : ")
 			rccPath, _ = reader.ReadString('\n')
 			rccPath = strings.TrimSpace(rccPath)
 			if !fileExists(rccPath) {
@@ -106,7 +106,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 
 	// Generating cgo code for binding
 	fmt.Println()
-	fmt.Println("Generating some code for binding...")
+	fmt.Print("Generating some code for binding...")
 
 	gen := Generator{
 		Qmake: qmakePath,
@@ -116,12 +116,14 @@ func setupHandler(cmd *cobra.Command, args []string) {
 
 	cgoFlags, err := gen.CreateCgoFlags()
 	if err != nil {
+		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)
 		return
 	}
 
 	err = gen.CreateCgoFile(qamelDir, cgoFlags)
 	if err != nil {
+		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)
 		return
 	}
@@ -129,26 +131,27 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	// Generating moc file for viewer
 	err = gen.CreateMocFile(fp.Join(qamelDir, "viewer.cpp"), "")
 	if err != nil {
+		fmt.Println()
 		cRedBold.Println("Failed to create moc file for viewer:", err)
 		return
 	}
 
-	cGreen.Println("Done")
+	cGreen.Println("done")
 
 	// Save generator as JSON in config file
-	fmt.Println()
-	fmt.Println("Saving config file...")
+	fmt.Print("Saving config file...")
 
 	err = gen.SaveToFile()
 	if err != nil {
+		fmt.Println()
 		cRedBold.Println("Failed to save the config file:", err)
 		return
 	}
 
-	cGreen.Println("Done")
+	cGreen.Println("done")
 
 	// Setup finished
 	fmt.Println()
-	cGreenBold.Println("Setup finished.")
-	cGreenBold.Println("Now you can get started on your own QML app.")
+	cBlueBold.Println("Setup finished.")
+	cBlueBold.Println("Now you can get started on your own QML app.")
 }

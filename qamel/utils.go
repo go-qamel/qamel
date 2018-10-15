@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	cBold      = color.New(color.FgCyan, color.Bold)
+	cCyan      = color.New(color.FgCyan)
+	cCyanBold  = color.New(color.FgCyan, color.Bold)
 	cRed       = color.New(color.FgRed)
 	cRedBold   = color.New(color.FgRed, color.Bold)
 	cGreen     = color.New(color.FgGreen)
