@@ -4,7 +4,7 @@ package qamel
 // Qt uses a weighting scale from 0 to 99 similar to,
 // but not the same as, the scales used in Windows or CSS.
 // A weight of 0 will be thin, whilst 99 will be extremely black.
-type FontWeight int
+type FontWeight int32
 
 const (
 	// Thin is barely visible, usually called hairline
@@ -28,7 +28,7 @@ const (
 )
 
 // Attribute describes attributes that change the behavior of application-wide features.
-type Attribute int
+type Attribute int32
 
 const (
 	// DontShowIconsInMenus make actions with the Icon property

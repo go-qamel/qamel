@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 // Constructor
-void* App_NewApplication(int argc, char** argv);
+void* App_NewApplication(int argc, char* argv[]);
 
 // Static function
 void App_SetAttribute(int attribute, bool on);

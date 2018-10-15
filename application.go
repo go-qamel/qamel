@@ -17,7 +17,7 @@ func NewApplication(argc int, argv []string) Application {
 	argvC := sliceToChars(argv)
 	defer C.free(unsafe.Pointer(argvC))
 
-	ptr := C.App_NewApplication(C.int(argc), argvC)
+	ptr := C.App_NewApplication(C.int(int32(argc)), argvC)
 	return Application{ptr: ptr}
 }
 
@@ -35,7 +35,7 @@ func (app Application) SetFont(fontFamily string, pointSize int, weight FontWeig
 
 	cFontFamily := C.CString(fontFamily)
 	defer C.free(unsafe.Pointer(cFontFamily))
-	C.App_SetFont(app.ptr, cFontFamily, C.int(pointSize), C.int(weight), C.bool(italic))
+	C.App_SetFont(app.ptr, cFontFamily, C.int(int32(pointSize)), C.int(weight), C.bool(italic))
 }
 
 // SetQuitOnLastWindowClosed set whether the application implicitly quits

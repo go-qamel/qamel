@@ -5,7 +5,7 @@
 #include <QString>
 #include <QIcon>
 
-void* App_NewApplication(int argc, char** argv) {
+void* App_NewApplication(int argc, char* argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     return new QGuiApplication(argc, argv);
 }

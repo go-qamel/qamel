@@ -1,7 +1,7 @@
 package qamel
 
 // ResizeMode specifies how to resize the view.
-type ResizeMode int
+type ResizeMode int32
 
 const (
 	// SizeViewToRootObject makes the view resizes with the root item in the QML.
@@ -15,7 +15,7 @@ const (
 // WindowFlags is used to specify various window-system properties for the widget.
 // They are fairly unusual but necessary in a few cases. Some of these flags depend on
 // whether the underlying window manager supports them.
-type WindowFlags int64
+type WindowFlags int32
 
 const (
 	// Widget is the default type for QWidget. Widgets of this type are child widgets
@@ -187,7 +187,7 @@ const (
 )
 
 // WindowStates is used to specify the current state of a top-level window.
-type WindowStates int
+type WindowStates int32
 
 const (
 	// WindowNoState makes the window has no state set (in normal state).

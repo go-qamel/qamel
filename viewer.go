@@ -70,7 +70,7 @@ func (view Viewer) SetHeight(height int) {
 		return
 	}
 
-	C.Viewer_SetHeight(view.ptr, C.int(height))
+	C.Viewer_SetHeight(view.ptr, C.int(int32(height)))
 }
 
 // SetWidth sets the width of the window.
@@ -79,7 +79,7 @@ func (view Viewer) SetWidth(width int) {
 		return
 	}
 
-	C.Viewer_SetWidth(view.ptr, C.int(width))
+	C.Viewer_SetWidth(view.ptr, C.int(int32(width)))
 }
 
 // SetMaximumHeight sets the maximum height of the window.
@@ -88,7 +88,7 @@ func (view Viewer) SetMaximumHeight(height int) {
 		return
 	}
 
-	C.Viewer_SetMaximumHeight(view.ptr, C.int(height))
+	C.Viewer_SetMaximumHeight(view.ptr, C.int(int32(height)))
 }
 
 // SetMaximumWidth sets the maximum width of the window.
@@ -97,7 +97,7 @@ func (view Viewer) SetMaximumWidth(width int) {
 		return
 	}
 
-	C.Viewer_SetMaximumWidth(view.ptr, C.int(width))
+	C.Viewer_SetMaximumWidth(view.ptr, C.int(int32(width)))
 }
 
 // SetMinimumHeight sets the minimum height of the window.
@@ -106,7 +106,7 @@ func (view Viewer) SetMinimumHeight(height int) {
 		return
 	}
 
-	C.Viewer_SetMinimumHeight(view.ptr, C.int(height))
+	C.Viewer_SetMinimumHeight(view.ptr, C.int(int32(height)))
 }
 
 // SetMinimumWidth sets the minimum width of the window.
@@ -115,7 +115,7 @@ func (view Viewer) SetMinimumWidth(width int) {
 		return
 	}
 
-	C.Viewer_SetMinimumWidth(view.ptr, C.int(width))
+	C.Viewer_SetMinimumWidth(view.ptr, C.int(int32(width)))
 }
 
 // SetOpacity sets the opacity of the window in the windowing system. If the windowing system supports
@@ -161,7 +161,7 @@ func (view Viewer) SetPosition(x int, y int) {
 		return
 	}
 
-	C.Viewer_SetPosition(view.ptr, C.int(x), C.int(y))
+	C.Viewer_SetPosition(view.ptr, C.int(int32(x)), C.int(int32(y)))
 }
 
 // SetIcon sets the window's icon in the windowing system. The window icon might be used by the windowing
