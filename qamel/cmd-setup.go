@@ -7,6 +7,7 @@ import (
 	fp "path/filepath"
 	"strings"
 
+	"github.com/RadhiFadlillah/qamel/qamel/generator"
 	"github.com/spf13/cobra"
 )
 
@@ -108,20 +109,14 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	fmt.Println()
 	fmt.Print("Generating some code for binding...")
 
-	gen := Generator{
-		Qmake: qmakePath,
-		Moc:   mocPath,
-		Rcc:   rccPath,
-	}
-
-	cgoFlags, err := gen.CreateCgoFlags()
+	cgoFlags, err := generator.CreateCgoFlags(qmakePath)
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)
 		return
 	}
 
-	err = gen.CreateCgoFile(qamelDir, cgoFlags)
+	err = generator.CreateCgoFile(qamelDir, cgoFlags)
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)
@@ -129,7 +124,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// Generating moc file for viewer
-	err = gen.CreateMocFile(fp.Join(qamelDir, "viewer.cpp"), "")
+	err = generator.CreateMocFile(mocPath, fp.Join(qamelDir, "viewer.cpp"))
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create moc file for viewer:", err)
@@ -138,10 +133,13 @@ func setupHandler(cmd *cobra.Command, args []string) {
 
 	cGreen.Println("done")
 
-	// Save generator as JSON in config file
+	// Save config file
 	fmt.Print("Saving config file...")
 
-	err = gen.SaveToFile()
+	err = saveConfig(config{
+		Qmake: qmakePath,
+		Moc:   mocPath,
+		Rcc:   rccPath})
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to save the config file:", err)

@@ -5,6 +5,7 @@ import (
 	"os"
 	fp "path/filepath"
 
+	"github.com/RadhiFadlillah/qamel/qamel/generator"
 	"github.com/spf13/cobra"
 )
 
@@ -42,13 +43,13 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Load generator
-	fmt.Print("Loading generator from file...")
+	// Load config file
+	fmt.Print("Load config file...")
 
-	gen, err := LoadGenerator()
+	cfg, err := loadConfig()
 	if err != nil {
 		fmt.Println()
-		cRedBold.Println("Failed to load generator:", err)
+		cRedBold.Println("Failed to load config file:", err)
 		cRedBold.Println("You might need to run `qamel setup` again.")
 		return
 	}
@@ -58,7 +59,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Create rcc file
 	fmt.Print("Generating Qt resource file...")
 
-	err = gen.CreateRccFile(dstDir)
+	err = generator.CreateRccFile(cfg.Rcc, dstDir)
 	if err != nil {
 		cYellow.Println(err)
 	} else {
