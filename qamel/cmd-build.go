@@ -27,6 +27,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// If destination directory is empty, use current working directory
+	// Else, make sure destination dir is exists
 	if dstDir == "" {
 		var err error
 		dstDir, err = os.Getwd()
@@ -34,6 +35,9 @@ func buildHandler(cmd *cobra.Command, args []string) {
 			cRedBold.Println("Failed to get current working dir:", err)
 			return
 		}
+	} else if !dirExists(dstDir) {
+		cRedBold.Println("Destination directory doesn't exist")
+		return
 	}
 
 	// Make sure destination dir is absolute
@@ -65,4 +69,18 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	} else {
 		cGreen.Println("done")
 	}
+
+	// Generate code for QmlObject structs
+	fmt.Print("Generating code for QML objects...")
+
+	errs := generator.CreateQmlObjectCode(cfg.Moc, dstDir)
+	if errs != nil && len(errs) > 0 {
+		fmt.Println()
+		for _, err := range errs {
+			cRedBold.Println("Failed:", err)
+		}
+		return
+	}
+
+	cGreen.Println("done")
 }

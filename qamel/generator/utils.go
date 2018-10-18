@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"os"
 	fp "path/filepath"
+	"strings"
+	"unicode"
 )
 
 // fileExists checks if the file in specified path is exists
@@ -56,4 +58,55 @@ func getPackageNameFromDir(dirPath string) (string, error) {
 	}
 
 	return getPackageName(fileName)
+}
+
+// getSubDirs fetch all sub directories, including the root dir
+func getSubDirs(rootDir string) ([]string, error) {
+	subDirs := []string{}
+	err := fp.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			return nil
+		}
+
+		if strings.HasPrefix(info.Name(), ".") {
+			return fp.SkipDir
+		}
+
+		subDirs = append(subDirs, path)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return subDirs, nil
+}
+
+// upperChar change char in pos to uppercase.
+func upperChar(str string, pos int) string {
+	if pos < 0 || pos >= len(str) {
+		return str
+	}
+
+	tmp := []byte(str)
+	upper := unicode.ToUpper(rune(tmp[pos]))
+	tmp[pos] = byte(upper)
+	return string(tmp)
+}
+
+// saveToFile saves a string content to file
+func saveToFile(dstPath string, content string) error {
+	dstFile, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	_, err = dstFile.WriteString(content)
+	if err != nil {
+		return err
+	}
+
+	return dstFile.Sync()
 }

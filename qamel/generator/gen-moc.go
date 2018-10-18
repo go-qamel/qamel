@@ -13,7 +13,7 @@ import (
 func CreateMocFile(mocPath string, src string) error {
 	// Make sure source is exist
 	if !fileExists(src) {
-		return fmt.Errorf("source file is not exists")
+		return fmt.Errorf("source file doesn't exists")
 	}
 
 	// Create destination name
