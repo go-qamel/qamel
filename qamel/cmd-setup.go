@@ -116,7 +116,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	err = generator.CreateCgoFile(qamelDir, cgoFlags)
+	err = generator.CreateCgoFile(qamelDir, cgoFlags, "")
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)

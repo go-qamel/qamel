@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	fp "path/filepath"
+	"strings"
 
 	"github.com/RadhiFadlillah/qamel/qamel/generator"
 	"github.com/spf13/cobra"
@@ -16,9 +18,18 @@ var cmdBuild = &cobra.Command{
 	Run:   buildHandler,
 }
 
+func init() {
+	cmdBuild.Flags().StringP("output", "o", "", "location for executable file")
+	cmdBuild.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
+}
+
 func buildHandler(cmd *cobra.Command, args []string) {
 	cBlueBold.Println("Starting build process.")
 	fmt.Println()
+
+	// Read flags
+	buildTags, _ := cmd.Flags().GetStringSlice("tags")
+	outputPath, _ := cmd.Flags().GetString("output")
 
 	// Get destination directory
 	dstDir := ""
@@ -49,7 +60,6 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Load config file
 	fmt.Print("Load config file...")
-
 	cfg, err := loadConfig()
 	if err != nil {
 		fmt.Println()
@@ -57,12 +67,19 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		cRedBold.Println("You might need to run `qamel setup` again.")
 		return
 	}
+	cGreen.Println("done")
 
+	// Remove old qamel files
+	fmt.Print("Removing old build files...")
+	err = removeQamelFiles(dstDir)
+	if err != nil {
+		cRedBold.Println("Failed to remove old build files:", err)
+		return
+	}
 	cGreen.Println("done")
 
 	// Create rcc file
 	fmt.Print("Generating Qt resource file...")
-
 	err = generator.CreateRccFile(cfg.Rcc, dstDir)
 	if err != nil {
 		cYellow.Println(err)
@@ -72,8 +89,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Generate code for QmlObject structs
 	fmt.Print("Generating code for QML objects...")
-
-	errs := generator.CreateQmlObjectCode(cfg.Moc, dstDir)
+	errs := generator.CreateQmlObjectCode(cfg.Moc, cfg.Qmake, dstDir, buildTags...)
 	if errs != nil && len(errs) > 0 {
 		fmt.Println()
 		for _, err := range errs {
@@ -81,6 +97,68 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		}
 		return
 	}
-
 	cGreen.Println("done")
+
+	// Run go build
+	fmt.Print("Building app...")
+	cmdArgs := []string{"build"}
+	if outputPath != "" {
+		cmdArgs = append(cmdArgs, "-o", outputPath)
+	}
+
+	if len(buildTags) > 0 {
+		cmdArgs = append(cmdArgs, buildTags...)
+	}
+
+	cmdGo := exec.Command("go", cmdArgs...)
+	cmdGo.Dir = dstDir
+	cmdGo.Env = append(os.Environ(),
+		`CGO_CFLAGS_ALLOW=.*`,
+		`CGO_CXXFLAGS_ALLOW=.*`,
+		`CGO_LDFLAGS_ALLOW=.*`)
+
+	cmdOutput, err := cmdGo.CombinedOutput()
+	if err != nil {
+		fmt.Println()
+		cRedBold.Println("Failed to build app:", err)
+		cRedBold.Println(string(cmdOutput))
+		return
+	}
+	cGreen.Println("done")
+
+	// Build finished
+	fmt.Println()
+	cBlueBold.Println("Build finished succesfully.")
+}
+
+// removeQamelFiles remove old generated qamel files in the specified dir
+func removeQamelFiles(rootDir string) error {
+	prefixes := []string{"cgo-", "moc-qamel-", "qamel-"}
+
+	err := fp.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			if strings.HasPrefix(info.Name(), ".") {
+				return fp.SkipDir
+			}
+			return nil
+		}
+
+		switch fileExt := fp.Ext(info.Name()); fileExt {
+		case ".h", ".go", ".cpp":
+		default:
+			return nil
+		}
+
+		for i := range prefixes {
+			if strings.HasPrefix(info.Name(), prefixes[i]) {
+				if err = os.Remove(path); err != nil {
+					return err
+				}
+			}
+		}
+
+		return nil
+	})
+
+	return err
 }

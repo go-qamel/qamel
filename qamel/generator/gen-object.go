@@ -45,7 +45,7 @@ type objectMethod struct {
 
 // CreateQmlObjectCode generates Go code and C++ code for all QmlObject
 // in specified directory
-func CreateQmlObjectCode(mocPath string, dirPath string, buildTags ...string) []error {
+func CreateQmlObjectCode(mocPath, qmakePath, dirPath string, buildTags ...string) []error {
 	// Make sure dir is exists
 	if !dirExists(dirPath) {
 		err := fmt.Errorf("directory %s doesn't exist", dirPath)
@@ -98,7 +98,10 @@ func CreateQmlObjectCode(mocPath string, dirPath string, buildTags ...string) []
 	}
 
 	// Create code for each QML objects
+	mapDirPackage := map[string]string{}
 	for _, obj := range qmlObjects {
+		mapDirPackage[obj.dirPath] = obj.packageName
+
 		err = createCppHeaderFile(obj)
 		if err != nil {
 			return []error{err}
@@ -110,6 +113,19 @@ func CreateQmlObjectCode(mocPath string, dirPath string, buildTags ...string) []
 		}
 
 		err = createGoFile(obj)
+		if err != nil {
+			return []error{err}
+		}
+	}
+
+	// Create cgo file for each package
+	cgoFlags, err := CreateCgoFlags(qmakePath)
+	if err != nil {
+		return []error{err}
+	}
+
+	for dir, packageName := range mapDirPackage {
+		err = CreateCgoFile(dir, cgoFlags, packageName)
 		if err != nil {
 			return []error{err}
 		}

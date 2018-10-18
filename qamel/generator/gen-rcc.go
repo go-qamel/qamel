@@ -58,7 +58,7 @@ func CreateRccFile(rccPath string, dstDir string) error {
 	qrcFile.Sync()
 
 	// Run rcc
-	dst := fp.Join(dstDir, "rcc.cpp")
+	dst := fp.Join(dstDir, "qamel-rcc.cpp")
 	cmdRcc := exec.Command(rccPath, "-o", dst, qrcPath)
 	return cmdRcc.Run()
 }
