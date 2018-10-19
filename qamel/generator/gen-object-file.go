@@ -161,17 +161,21 @@ func createCppFile(mocPath string, obj object) error {
 
 	// Write class's signals
 	// properties signals
-	result += fmt.Sprintln("\nsignals:")
-	for _, prop := range obj.properties {
+	result += fmt.Sprintln("signals:")
+	for i, prop := range obj.properties {
 		propType := mapGoType[prop.memberType].inCpp
 		propNewName := "new" + upperChar(prop.name, 0)
 
 		result += fmt.Sprintf("\tvoid %sChanged(%s %s);\n",
 			prop.name, propType, propNewName)
+
+		if i < len(obj.properties)-1 {
+			result += "\n"
+		}
 	}
 
 	// the real signals
-	for _, signal := range obj.signals {
+	for i, signal := range obj.signals {
 		params := []string{}
 		for _, param := range signal.parameters {
 			paramType := mapGoType[param.memberType].inCpp
@@ -181,6 +185,10 @@ func createCppFile(mocPath string, obj object) error {
 
 		result += fmt.Sprintf("\tvoid %s(%s);\n",
 			signal.name, strings.Join(params, ", "))
+
+		if i < len(obj.signals)-1 {
+			result += "\n"
+		}
 	}
 
 	// Write class's slots
@@ -223,7 +231,7 @@ func createCppFile(mocPath string, obj object) error {
 	}
 
 	// Finished writing definition of class
-	result += "};\n\n"
+	result += "};\n"
 
 	// Write public methods
 	// for manipulating properties
