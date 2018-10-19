@@ -8,7 +8,7 @@ import (
 )
 
 // CreateRccFile creates rcc.cpp file from resource directory at `dstDir/res`
-func CreateRccFile(rccPath string, dstDir string) error {
+func CreateRccFile(rccPath string, dstDir string, cgoFlags string) error {
 	// Check if resource directory is exist
 	resDir := fp.Join(dstDir, "res")
 	if !dirExists(resDir) {
@@ -60,5 +60,11 @@ func CreateRccFile(rccPath string, dstDir string) error {
 	// Run rcc
 	dst := fp.Join(dstDir, "qamel-rcc.cpp")
 	cmdRcc := exec.Command(rccPath, "-o", dst, qrcPath)
-	return cmdRcc.Run()
+	btOutput, err := cmdRcc.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%v\n%s", err, btOutput)
+	}
+
+	// Create cgo file
+	return CreateCgoFile(dstDir, cgoFlags, "")
 }

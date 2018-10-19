@@ -78,9 +78,19 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 	cGreen.Println("done")
 
+	// Create cgo flags
+	fmt.Print("Generating cgo flags...")
+	cgoFlags, err := generator.CreateCgoFlags(cfg.Qmake)
+	if err != nil {
+		fmt.Println()
+		cRedBold.Println("Failed to create cgo flags:", err)
+		return
+	}
+	cGreen.Println("done")
+
 	// Create rcc file
 	fmt.Print("Generating Qt resource file...")
-	err = generator.CreateRccFile(cfg.Rcc, dstDir)
+	err = generator.CreateRccFile(cfg.Rcc, dstDir, cgoFlags)
 	if err != nil {
 		cYellow.Println(err)
 	} else {
@@ -89,7 +99,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Generate code for QmlObject structs
 	fmt.Print("Generating code for QML objects...")
-	errs := generator.CreateQmlObjectCode(cfg.Moc, cfg.Qmake, dstDir, buildTags...)
+	errs := generator.CreateQmlObjectCode(cfg.Moc, dstDir, cgoFlags, buildTags...)
 	if errs != nil && len(errs) > 0 {
 		fmt.Println()
 		for _, err := range errs {
@@ -107,6 +117,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 
 	if len(buildTags) > 0 {
+		cmdArgs = append(cmdArgs, "-tags")
 		cmdArgs = append(cmdArgs, buildTags...)
 	}
 
