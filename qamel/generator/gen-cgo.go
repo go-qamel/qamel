@@ -118,7 +118,7 @@ func CreateCgoFile(dstDir string, cgoFlags string, pkgName string) error {
 	}
 
 	// Create destination file
-	fileName := fp.Join(dstDir, "cgo-"+pkgName+".go")
+	fileName := fp.Join(dstDir, "qamel-cgo-"+pkgName+".go")
 	dstFile, err := os.Create(fileName)
 	if err != nil {
 		return err

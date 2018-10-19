@@ -133,7 +133,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 // removeQamelFiles remove old generated qamel files in the specified dir
 func removeQamelFiles(rootDir string) error {
-	prefixes := []string{"cgo-", "moc-qamel-", "qamel-"}
+	prefixes := []string{"moc-qamel-", "qamel-"}
 
 	err := fp.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
