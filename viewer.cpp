@@ -25,11 +25,6 @@ void* Viewer_NewViewer() {
     return new QamelView();
 }
 
-void* Viewer_NewViewerWithSource(char* source) {
-    QUrl url = QUrl(QString(source));
-    return new QamelView(url);
-}
-
 void Viewer_SetSource(void* ptr, char* url) {
     QamelView *view = static_cast<QamelView*>(ptr);
     QMetaObject::invokeMethod(view, "setSource", Q_ARG(QUrl, QUrl(QString(url))));

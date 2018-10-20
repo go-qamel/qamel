@@ -9,7 +9,6 @@ extern "C" {
 
 // Constructors
 void* Engine_NewEngine();
-void* Engine_NewEngineWithSource(char* source);
 
 // Methods
 void Engine_Load(void* ptr, char* url);

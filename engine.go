@@ -20,11 +20,9 @@ func NewEngine() Engine {
 
 // NewEngineWithSource constructs a QQmlApplicationEngine with the given QML source.
 func NewEngineWithSource(source string) Engine {
-	cSource := C.CString(source)
-	defer C.free(unsafe.Pointer(cSource))
-
-	ptr := C.Engine_NewEngineWithSource(cSource)
-	return Engine{ptr: ptr}
+	engine := NewEngine()
+	engine.Load(source)
+	return engine
 }
 
 // Load loads the root QML file located at url. The object tree defined by the file is

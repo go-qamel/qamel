@@ -19,11 +19,9 @@ func NewViewer() Viewer {
 
 // NewViewerWithSource constructs a QQuickView with the given QML source.
 func NewViewerWithSource(source string) Viewer {
-	cSource := C.CString(source)
-	defer C.free(unsafe.Pointer(cSource))
-
-	ptr := C.Viewer_NewViewerWithSource(cSource)
-	return Viewer{ptr: ptr}
+	view := NewViewer()
+	view.SetSource(source)
+	return view
 }
 
 // SetSource sets the source to the url, loads the QML component and instantiates it.

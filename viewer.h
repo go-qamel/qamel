@@ -13,7 +13,6 @@ extern "C" {
 
 // Constructor
 void* Viewer_NewViewer();
-void* Viewer_NewViewerWithSource(char* source);
 
 // Methods
 void Viewer_SetSource(void* ptr, char* url);

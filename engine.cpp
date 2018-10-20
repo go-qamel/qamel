@@ -7,11 +7,6 @@ void* Engine_NewEngine() {
     return new QQmlApplicationEngine();
 }
 
-void* Engine_NewEngineWithSource(char* source) {
-    QUrl url = QUrl(QString(source));
-    return new QQmlApplicationEngine(url);
-}
-
 void Engine_Load(void* ptr, char* url) {
     QQmlApplicationEngine *engine = static_cast<QQmlApplicationEngine*>(ptr);
     engine->load(QUrl(QString(url)));
