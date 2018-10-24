@@ -44,18 +44,18 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		dstDir, err = os.Getwd()
 		if err != nil {
 			cRedBold.Println("Failed to get current working dir:", err)
-			return
+			os.Exit(1)
 		}
 	} else if !dirExists(dstDir) {
 		cRedBold.Println("Destination directory doesn't exist")
-		return
+		os.Exit(1)
 	}
 
 	// Make sure destination dir is absolute
 	dstDir, err := fp.Abs(dstDir)
 	if err != nil {
 		cRedBold.Println("Failed to get destination dir:", err)
-		return
+		os.Exit(1)
 	}
 
 	// Load config file
@@ -65,7 +65,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		fmt.Println()
 		cRedBold.Println("Failed to load config file:", err)
 		cRedBold.Println("You might need to run `qamel setup` again.")
-		return
+		os.Exit(1)
 	}
 	cGreen.Println("done")
 
@@ -74,7 +74,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	err = removeQamelFiles(dstDir)
 	if err != nil {
 		cRedBold.Println("Failed to remove old build files:", err)
-		return
+		os.Exit(1)
 	}
 	cGreen.Println("done")
 
@@ -84,7 +84,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create cgo flags:", err)
-		return
+		os.Exit(1)
 	}
 	cGreen.Println("done")
 
@@ -105,7 +105,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		for _, err := range errs {
 			cRedBold.Println("Failed:", err)
 		}
-		return
+		os.Exit(1)
 	}
 	cGreen.Println("done")
 
@@ -133,7 +133,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		fmt.Println()
 		cRedBold.Println("Failed to build app:", err)
 		cRedBold.Println(string(cmdOutput))
-		return
+		os.Exit(1)
 	}
 	cGreen.Println("done")
 

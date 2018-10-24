@@ -36,7 +36,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	qtDir = strings.TrimSpace(qtDir)
 	if !dirExists(qtDir) {
 		cRedBold.Println("The specified directory does not exist")
-		return
+		os.Exit(1)
 	}
 
 	// Make sure qmake, moc, and rcc is exists
@@ -80,7 +80,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 			qmakePath = strings.TrimSpace(qmakePath)
 			if !fileExists(qmakePath) {
 				cRedBold.Println("The specified path does not exist")
-				return
+				os.Exit(1)
 			}
 		}
 
@@ -90,7 +90,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 			mocPath = strings.TrimSpace(mocPath)
 			if !fileExists(mocPath) {
 				cRedBold.Println("The specified path does not exist")
-				return
+				os.Exit(1)
 			}
 		}
 
@@ -100,7 +100,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 			rccPath = strings.TrimSpace(rccPath)
 			if !fileExists(rccPath) {
 				cRedBold.Println("The specified path does not exist")
-				return
+				os.Exit(1)
 			}
 		}
 	}
@@ -113,14 +113,14 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)
-		return
+		os.Exit(1)
 	}
 
 	err = generator.CreateCgoFile(qamelDir, cgoFlags, "")
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create cgo file:", err)
-		return
+		os.Exit(1)
 	}
 
 	// Generating moc file for viewer
@@ -128,7 +128,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to create moc file for viewer:", err)
-		return
+		os.Exit(1)
 	}
 
 	cGreen.Println("done")
@@ -143,7 +143,7 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to save the config file:", err)
-		return
+		os.Exit(1)
 	}
 
 	cGreen.Println("done")
