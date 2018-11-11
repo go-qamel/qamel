@@ -127,7 +127,7 @@ func (app Application) Exec() int {
 
 func sliceToChars(src []string) **C.char {
 	cArray := C.malloc(C.size_t(len(src)) * C.size_t(unsafe.Sizeof(uintptr(0))))
-	a := (*[1<<30 - 1]*C.char)(cArray)
+	a := (*[1 << 28]*C.char)(cArray)
 
 	for i, str := range src {
 		a[i] = C.CString(str)
