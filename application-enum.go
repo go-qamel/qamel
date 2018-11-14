@@ -28,7 +28,7 @@ const (
 )
 
 // Attribute describes attributes that change the behavior of application-wide features.
-type Attribute int32
+type Attribute int64
 
 const (
 	// DontShowIconsInMenus make actions with the Icon property
