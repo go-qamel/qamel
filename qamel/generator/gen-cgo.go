@@ -49,11 +49,15 @@ func CreateCgoFlags(qmakePath string) (string, error) {
 	}
 
 	cmdQmake := exec.Command(qmakePath, "-o", makeFilePath, "-spec", qmakeSpec, proFilePath)
-	if err = cmdQmake.Run(); err != nil {
-		return "", err
+	if btOutput, err := cmdQmake.CombinedOutput(); err != nil {
+		return "", fmt.Errorf("%v\n%s", err, btOutput)
 	}
 
 	// Parse makefile
+	if runtime.GOOS == "windows" {
+		makeFilePath += ".Release"
+	}
+
 	mapCompiler := map[string]string{}
 	makeFile, err := os.Open(makeFilePath)
 	if err != nil {

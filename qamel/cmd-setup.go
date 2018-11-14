@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	fp "path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/RadhiFadlillah/qamel/qamel/generator"
@@ -43,6 +44,11 @@ func setupHandler(cmd *cobra.Command, args []string) {
 	qmakePath := fp.Join(qtDir, "qmake")
 	mocPath := fp.Join(qtDir, "moc")
 	rccPath := fp.Join(qtDir, "rcc")
+	if runtime.GOOS == "windows" {
+		qmakePath += ".exe"
+		mocPath += ".exe"
+		rccPath += ".exe"
+	}
 
 	qmakeExists := fileExists(qmakePath)
 	mocExists := fileExists(mocPath)
