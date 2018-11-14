@@ -20,6 +20,11 @@ func createCppHeaderFile(obj object) error {
 		"#define %s\n\n",
 		guardName, guardName)
 
+	// Write std library
+	result += "" +
+		"#include <stdint.h>\n" +
+		"#include <stdbool.h>\n\n"
+
 	// Write check for C++ and class declaration
 	className := upperChar(obj.name, 0)
 	result += fmt.Sprintf(""+
@@ -340,7 +345,9 @@ func createGoFile(obj object) error {
 	// Write clause for importing C packages
 	result += fmt.Sprintf(""+
 		"// #include <stdlib.h>\n"+
+		"// #include <stdint.h>\n"+
 		"// #include <stdbool.h>\n"+
+		"// #include <string.h>\n"+
 		"// #include \"%s\"\n"+
 		`import "C"`+"\n", hFileName)
 

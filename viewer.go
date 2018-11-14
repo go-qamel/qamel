@@ -1,6 +1,8 @@
 package qamel
 
+// #include <stdint.h>
 // #include <stdlib.h>
+// #include <string.h>
 // #include <stdbool.h>
 // #include "viewer.h"
 import "C"

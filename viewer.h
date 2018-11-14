@@ -3,6 +3,9 @@
 #ifndef QAMEL_VIEWER_H
 #define QAMEL_VIEWER_H
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #ifdef __cplusplus
 
 // Class
