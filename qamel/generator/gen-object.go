@@ -434,6 +434,7 @@ func validateMethodType(members []objectMember) error {
 	return nil
 }
 
+// validateTagName check if member has a valid tag name
 func validateTagName(tagName string) error {
 	if tagName == "" {
 		return nil
