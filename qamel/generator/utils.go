@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
+	"io"
 	"io/ioutil"
 	"os"
 	fp "path/filepath"
@@ -21,6 +22,22 @@ func fileExists(filePath string) bool {
 func dirExists(dirPath string) bool {
 	info, err := os.Stat(dirPath)
 	return !os.IsNotExist(err) && info.IsDir()
+}
+
+// dirEmpty checks if the directory in specified path is EMPTY
+func dirEmpty(dirPath string) bool {
+	f, err := os.Open(dirPath)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true
+	}
+
+	return false
 }
 
 // getPackageName gets the package name from specified file

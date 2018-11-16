@@ -5,10 +5,18 @@ import (
 	"os"
 	"os/exec"
 	fp "path/filepath"
+
+	"github.com/RadhiFadlillah/qamel/qamel/config"
 )
 
 // CreateRccFile creates rcc.cpp file from resource directory at `dstDir/res`
-func CreateRccFile(rccPath string, dstDir string, cgoFlags string) error {
+func CreateRccFile(profile config.Profile, dstDir string) error {
+	// Create cgo file
+	err := CreateCgoFile(profile, dstDir, "main")
+	if err != nil {
+		return err
+	}
+
 	// Check if resource directory is exist
 	resDir := fp.Join(dstDir, "res")
 	if !dirExists(resDir) {
@@ -59,12 +67,11 @@ func CreateRccFile(rccPath string, dstDir string, cgoFlags string) error {
 
 	// Run rcc
 	dst := fp.Join(dstDir, "qamel-rcc.cpp")
-	cmdRcc := exec.Command(rccPath, "-o", dst, qrcPath)
+	cmdRcc := exec.Command(profile.Rcc, "-o", dst, qrcPath)
 	btOutput, err := cmdRcc.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%v\n%s", err, btOutput)
 	}
 
-	// Create cgo file
-	return CreateCgoFile(dstDir, cgoFlags, "")
+	return nil
 }

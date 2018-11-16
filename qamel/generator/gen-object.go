@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/RadhiFadlillah/qamel/qamel/config"
 )
 
 var (
@@ -45,7 +47,7 @@ type objectMethod struct {
 
 // CreateQmlObjectCode generates Go code and C++ code for all QmlObject
 // in specified directory
-func CreateQmlObjectCode(mocPath, dirPath, cgoFlags string, buildTags ...string) []error {
+func CreateQmlObjectCode(profile config.Profile, dirPath string, buildTags ...string) []error {
 	// Make sure dir is exists
 	if !dirExists(dirPath) {
 		err := fmt.Errorf("directory %s doesn't exist", dirPath)
@@ -107,7 +109,7 @@ func CreateQmlObjectCode(mocPath, dirPath, cgoFlags string, buildTags ...string)
 			return []error{err}
 		}
 
-		err = createCppFile(mocPath, obj)
+		err = createCppFile(profile.Moc, obj)
 		if err != nil {
 			return []error{err}
 		}
@@ -120,7 +122,7 @@ func CreateQmlObjectCode(mocPath, dirPath, cgoFlags string, buildTags ...string)
 
 	// Create cgo file for each package
 	for dir, packageName := range mapDirPackage {
-		err = CreateCgoFile(dir, cgoFlags, packageName)
+		err = CreateCgoFile(profile, dir, packageName)
 		if err != nil {
 			return []error{err}
 		}

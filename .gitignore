@@ -2,9 +2,12 @@
 .vscode/
 
 # Exclude generated file
+*.jsc
+*.qmlc
 moc-*.h
 qamel-*.go
 qamel/qamel*
+*_plugin_import.cpp
 
 # Exclude sample dir
 sample/

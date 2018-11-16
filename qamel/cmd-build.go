@@ -7,6 +7,7 @@ import (
 	fp "path/filepath"
 	"strings"
 
+	"github.com/RadhiFadlillah/qamel/qamel/config"
 	"github.com/RadhiFadlillah/qamel/qamel/generator"
 	"github.com/spf13/cobra"
 )
@@ -20,6 +21,7 @@ var cmdBuild = &cobra.Command{
 
 func init() {
 	cmdBuild.Flags().StringP("output", "o", "", "location for executable file")
+	cmdBuild.Flags().StringP("profile", "p", "", "profile that used for building app")
 	cmdBuild.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
 }
 
@@ -30,6 +32,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Read flags
 	buildTags, _ := cmd.Flags().GetStringSlice("tags")
 	outputPath, _ := cmd.Flags().GetString("output")
+	profileName, _ := cmd.Flags().GetString("profile")
 
 	// Get destination directory
 	dstDir := ""
@@ -60,11 +63,17 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Load config file
 	fmt.Print("Load config file...")
-	cfg, err := loadConfig()
+
+	profileName = strings.TrimSpace(profileName)
+	if profileName == "" {
+		profileName = "default"
+	}
+
+	profile, err := config.LoadProfile(configPath, profileName)
 	if err != nil {
 		fmt.Println()
-		cRedBold.Println("Failed to load config file:", err)
-		cRedBold.Println("You might need to run `qamel setup` again.")
+		cRedBold.Println("Failed to load profile file:", err)
+		cRedBold.Println("You might need to run `qamel profile setup` again.")
 		os.Exit(1)
 	}
 	cGreen.Println("done")
@@ -78,19 +87,20 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 	cGreen.Println("done")
 
-	// Create cgo flags
-	fmt.Print("Generating cgo flags...")
-	cgoFlags, err := generator.CreateCgoFlags(cfg.Qmake)
+	// Generate cgo file for binding in qamel directory
+	os.Remove(fp.Join(qamelDir, "qamel_plugin_import.cpp"))
+	os.Remove(fp.Join(qamelDir, "qamel_qml_plugin_import.cpp"))
+
+	err = generator.CreateCgoFile(profile, qamelDir, "")
 	if err != nil {
 		fmt.Println()
-		cRedBold.Println("Failed to create cgo flags:", err)
+		cRedBold.Println("Failed to create cgo file:", err)
 		os.Exit(1)
 	}
-	cGreen.Println("done")
 
 	// Create rcc file
 	fmt.Print("Generating Qt resource file...")
-	err = generator.CreateRccFile(cfg.Rcc, dstDir, cgoFlags)
+	err = generator.CreateRccFile(profile, dstDir)
 	if err != nil {
 		cYellow.Println(err)
 	} else {
@@ -99,7 +109,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Generate code for QmlObject structs
 	fmt.Print("Generating code for QML objects...")
-	errs := generator.CreateQmlObjectCode(cfg.Moc, dstDir, cgoFlags, buildTags...)
+	errs := generator.CreateQmlObjectCode(profile, dstDir, buildTags...)
 	if errs != nil && len(errs) > 0 {
 		fmt.Println()
 		for _, err := range errs {
@@ -121,12 +131,25 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		cmdArgs = append(cmdArgs, buildTags...)
 	}
 
+	ldFlags := "all=-s -w"
+	if profile.OS == "windows" {
+		ldFlags += " -H=windowsgui"
+	}
+
+	cmdArgs = append(cmdArgs, "-ldflags")
+	cmdArgs = append(cmdArgs, ldFlags)
+
 	cmdGo := exec.Command("go", cmdArgs...)
 	cmdGo.Dir = dstDir
 	cmdGo.Env = append(os.Environ(),
+		`CGO_ENABLED=1`,
 		`CGO_CFLAGS_ALLOW=.*`,
 		`CGO_CXXFLAGS_ALLOW=.*`,
-		`CGO_LDFLAGS_ALLOW=.*`)
+		`CGO_LDFLAGS_ALLOW=.*`,
+		"GOOS="+profile.OS,
+		"GOARCH="+profile.Arch,
+		"CC="+profile.Gcc,
+		"CXX="+profile.Gxx)
 
 	cmdOutput, err := cmdGo.CombinedOutput()
 	if err != nil {
@@ -160,11 +183,13 @@ func removeQamelFiles(rootDir string) error {
 			return nil
 		}
 
+		if strings.HasSuffix(info.Name(), "_plugin_import.cpp") {
+			return os.Remove(path)
+		}
+
 		for i := range prefixes {
 			if strings.HasPrefix(info.Name(), prefixes[i]) {
-				if err = os.Remove(path); err != nil {
-					return err
-				}
+				return os.Remove(path)
 			}
 		}
 

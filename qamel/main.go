@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Register sub command
-	rootCmd.AddCommand(cmdSetup, cmdBuild)
+	rootCmd.AddCommand(cmdProfile, cmdBuild)
 
 	// Execute app
 	if err := rootCmd.Execute(); err != nil {
