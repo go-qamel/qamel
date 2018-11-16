@@ -9,5 +9,6 @@ qamel-*.go
 qamel/qamel*
 *_plugin_import.cpp
 
-# Exclude sample dir
-sample/
+# Exclude sample executable
+sample/sample
+sample/sample.exe
