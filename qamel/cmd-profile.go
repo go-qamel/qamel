@@ -6,6 +6,7 @@ import (
 	"os"
 	fp "path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/RadhiFadlillah/qamel/qamel/config"
@@ -27,14 +28,23 @@ var cmdProfileSetup = &cobra.Command{
 }
 
 var cmdProfileDelete = &cobra.Command{
-	Use:   "delete",
-	Short: "Delete an existing profile",
-	Args:  cobra.ExactArgs(1),
-	Run:   profileDeleteHandler,
+	Use:     "delete",
+	Short:   "Delete an existing profile",
+	Args:    cobra.ExactArgs(1),
+	Run:     profileDeleteHandler,
+	Aliases: []string{"rm"},
+}
+
+var cmdProfileList = &cobra.Command{
+	Use:     "list",
+	Short:   "List all existing profile",
+	Args:    cobra.NoArgs,
+	Run:     profileListHandler,
+	Aliases: []string{"ls"},
 }
 
 func init() {
-	cmdProfile.AddCommand(cmdProfileSetup, cmdProfileDelete)
+	cmdProfile.AddCommand(cmdProfileSetup, cmdProfileDelete, cmdProfileList)
 }
 
 func profileSetupHandler(cmd *cobra.Command, args []string) {
@@ -291,4 +301,24 @@ func profileDeleteHandler(cmd *cobra.Command, args []string) {
 	}
 
 	cBlueBold.Printf("Profile %s has been removed.\n", profileName)
+}
+
+func profileListHandler(cmd *cobra.Command, args []string) {
+	// Load existing profiles
+	profiles, err := config.LoadProfiles(configPath)
+	if err != nil {
+		cRedBold.Println("Failed to get list of profile:", err)
+		os.Exit(1)
+	}
+
+	// Get list of profile name
+	names := []string{}
+	for key := range profiles {
+		names = append(names, key)
+	}
+
+	sort.Strings(names)
+	for i := 0; i < len(names); i++ {
+		fmt.Println(names[i])
+	}
 }
