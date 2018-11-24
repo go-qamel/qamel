@@ -443,10 +443,6 @@ func createGoFile(obj object) error {
 			obj.name, prop.name, prop.memberType,
 			propName, cClassName, propName)
 
-		if prop.memberType == "string" {
-			result += fmt.Sprintf("defer C.free(unsafe.Pointer(c%s))\n", propName)
-		}
-
 		result += fmt.Sprintf("propValue = %s\nreturn\n}\n\n",
 			mapGoType[prop.memberType].cgo2Go("c"+propName))
 
