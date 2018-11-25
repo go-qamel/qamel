@@ -279,14 +279,14 @@ func createCppFile(mocPath string, obj object) error {
 	result += "\n"
 	for i, signal := range obj.signals {
 		params := []string{"void* ptr"}
-		invokerParams := []string{fmt.Sprintf(`obj, "%s"`, signal.name)}
+		invokerParams := []string{}
 
 		for _, param := range signal.parameters {
 			paramType := mapGoType[param.memberType].inCpp
 			paramHeaderType := mapGoType[param.memberType].inC
 
 			strParam := fmt.Sprintf("%s %s", paramHeaderType, param.name)
-			strInvokerParam := fmt.Sprintf("Q_ARG(%s, %s(%s))", paramType, paramType, param.name)
+			strInvokerParam := fmt.Sprintf("%s(%s)", paramType, param.name)
 
 			params = append(params, strParam)
 			invokerParams = append(invokerParams, strInvokerParam)
@@ -296,9 +296,10 @@ func createCppFile(mocPath string, obj object) error {
 		result += fmt.Sprintf(""+
 			"void %s_%s(%s) {\n"+
 			"\t%s *obj = static_cast<%s*>(ptr);\n"+
-			"\tQMetaObject::invokeMethod(%s);\n"+
+			"\tobj->%s(%s);\n"+
 			"}\n", className, signalName, strings.Join(params, ", "),
-			className, className, strings.Join(invokerParams, ",\n\t\t"))
+			className, className,
+			signal.name, strings.Join(invokerParams, ", "))
 
 		if i < len(obj.signals)-1 {
 			result += "\n"
