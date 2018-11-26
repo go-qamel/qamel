@@ -45,6 +45,12 @@ func ReturnObject(ptr unsafe.Pointer) {
 	mutex.Unlock()
 }
 
+// ObjectExists checks if object exists in map
+func ObjectExists(ptr unsafe.Pointer) bool {
+	obj, ok := mapObject[ptr]
+	return ok && obj != nil
+}
+
 // DeleteObject remove object for the specified pointer
 func DeleteObject(ptr unsafe.Pointer) {
 	if ptr == nil {

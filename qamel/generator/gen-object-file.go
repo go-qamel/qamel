@@ -437,7 +437,7 @@ func createGoFile(obj object) error {
 		// getter
 		result += fmt.Sprintf(""+
 			"func (obj %s) %s() (propValue %s) {\n"+
-			"if obj.Ptr == nil {\n"+
+			"if obj.Ptr == nil || !qamel.ObjectExists(obj.Ptr) {\n"+
 			"return\n"+
 			"}\n\n"+
 			"c%s := C.%s_%s(obj.Ptr)\n",
@@ -450,7 +450,7 @@ func createGoFile(obj object) error {
 		// setter
 		result += fmt.Sprintf(""+
 			"func (obj %s) set%s(new%s %s) {\n"+
-			"if obj.Ptr == nil {\n"+
+			"if obj.Ptr == nil || !qamel.ObjectExists(obj.Ptr) {\n"+
 			"return\n"+
 			"}\n\n"+
 			"cNew%s := %s\n",
@@ -488,7 +488,7 @@ func createGoFile(obj object) error {
 
 		result += fmt.Sprintf(""+
 			"func (obj %s) %s(%s) {\n"+
-			"if obj.Ptr == nil {\n"+
+			"if obj.Ptr == nil || !qamel.ObjectExists(obj.Ptr) {\n"+
 			"return\n"+
 			"}\n\n"+
 			"%s\n"+
