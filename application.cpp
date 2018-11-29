@@ -1,6 +1,6 @@
 #include "application.h"
 #include <QCoreApplication>
-#include <QGuiApplication>
+#include <QApplication>
 #include <QFont>
 #include <QString>
 #include <QIcon>
@@ -17,7 +17,7 @@ void* App_NewApplication(int argc, char* argv) {
 	}
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    return new QGuiApplication(argcs, argvs);
+    return new QApplication(argcs, argvs);
 }
 
 void App_SetAttribute(long long attribute, bool on) {
@@ -26,38 +26,38 @@ void App_SetAttribute(long long attribute, bool on) {
 
 void App_SetFont(char *family, int pointSize, int weight, bool italic) {
     QFont font = QFont(QString(family), pointSize, weight, italic);
-    QGuiApplication::setFont(font);
+    QApplication::setFont(font);
 }
 
 void App_SetQuitOnLastWindowClosed(bool quit) {
-    QGuiApplication::setQuitOnLastWindowClosed(quit);
+    QApplication::setQuitOnLastWindowClosed(quit);
 }
 
 void App_SetApplicationDisplayName(char* name) {
-	QGuiApplication::setApplicationDisplayName(QString(name));
+	QApplication::setApplicationDisplayName(QString(name));
 }
 
 void App_SetWindowIcon(char* fileName) {
     QIcon icon = QIcon(QString(fileName));
-    QGuiApplication::setWindowIcon(icon);
+    QApplication::setWindowIcon(icon);
 }
 
 void App_SetApplicationName(char* name) {
-    QGuiApplication::setApplicationName(QString(name));
+    QApplication::setApplicationName(QString(name));
 }
 
 void App_SetApplicationVersion(char* version) {
-    QGuiApplication::setApplicationVersion(QString(version));
+    QApplication::setApplicationVersion(QString(version));
 }
 
 void App_SetOrganizationName(char* name) {
-    QGuiApplication::setOrganizationName(QString(name));
+    QApplication::setOrganizationName(QString(name));
 }
 
 void App_SetOrganizationDomain(char* domain) {
-    QGuiApplication::setOrganizationDomain(QString(domain));
+    QApplication::setOrganizationDomain(QString(domain));
 }
 
 int App_Exec() {
-    return QGuiApplication::exec();
+    return QApplication::exec();
 }

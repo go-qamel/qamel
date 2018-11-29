@@ -66,7 +66,7 @@ func CreateCgoFile(profile config.Profile, dstDir string, pkgName string) error 
 // createCgoFlags creates cgo flags by using qmake
 func createCgoFlags(profile config.Profile, dstDir string) (string, error) {
 	// Create project file
-	proContent := "QT += qml quick\n"
+	proContent := "QT += qml quick widgets\n"
 	proContent += "CONFIG += release\n"
 	if profile.OS == "windows" {
 		proContent += "CONFIG += windows\n"
