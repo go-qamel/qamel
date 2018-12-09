@@ -22,7 +22,6 @@ var cmdBuild = &cobra.Command{
 func init() {
 	cmdBuild.Flags().StringP("output", "o", "", "location for executable file")
 	cmdBuild.Flags().StringP("profile", "p", "", "profile that used for building app")
-	cmdBuild.Flags().BoolP("install", "i", false, "install app to $GOBIN directory")
 	cmdBuild.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
 }
 
@@ -34,7 +33,6 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	buildTags, _ := cmd.Flags().GetStringSlice("tags")
 	outputPath, _ := cmd.Flags().GetString("output")
 	profileName, _ := cmd.Flags().GetString("profile")
-	installApp, _ := cmd.Flags().GetBool("install")
 
 	// Get destination directory
 	dstDir := ""
@@ -124,11 +122,8 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Run go build
 	fmt.Print("Building app...")
 	cmdArgs := []string{"build"}
-	if installApp {
-		cmdArgs = []string{"install"}
-	}
 
-	if !installApp && outputPath != "" {
+	if outputPath != "" {
 		cmdArgs = append(cmdArgs, "-o", outputPath)
 	}
 
