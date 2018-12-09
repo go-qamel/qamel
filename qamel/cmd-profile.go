@@ -21,7 +21,7 @@ var cmdProfile = &cobra.Command{
 }
 
 var cmdProfileSetup = &cobra.Command{
-	Use:   "setup",
+	Use:   "setup [profileName]",
 	Short: "Set up a new or existing profile",
 	Args:  cobra.MaximumNArgs(1),
 	Run:   profileSetupHandler,
@@ -43,8 +43,15 @@ var cmdProfileList = &cobra.Command{
 	Aliases: []string{"ls"},
 }
 
+var cmdProfilePrint = &cobra.Command{
+	Use:   "print [profileName]",
+	Short: "Print data of specified profile",
+	Args:  cobra.MaximumNArgs(1),
+	Run:   profilePrintHandler,
+}
+
 func init() {
-	cmdProfile.AddCommand(cmdProfileSetup, cmdProfileDelete, cmdProfileList)
+	cmdProfile.AddCommand(cmdProfileSetup, cmdProfileDelete, cmdProfileList, cmdProfilePrint)
 }
 
 func profileSetupHandler(cmd *cobra.Command, args []string) {
@@ -321,4 +328,44 @@ func profileListHandler(cmd *cobra.Command, args []string) {
 	for i := 0; i < len(names); i++ {
 		fmt.Println(names[i])
 	}
+}
+
+func profilePrintHandler(cmd *cobra.Command, args []string) {
+	// Get profile name
+	profileName := "default"
+	if len(args) == 1 {
+		profileName = args[0]
+	}
+
+	// Load existing profiles
+	profiles, err := config.LoadProfiles(configPath)
+	if err != nil {
+		cRedBold.Println("Failed to print the profile:", err)
+		os.Exit(1)
+	}
+
+	// Save the profiles with removed item
+	profile, ok := profiles[profileName]
+	if !ok {
+		cRedBold.Printf("Failed to print the profile: %s not exists\n", profileName)
+		os.Exit(1)
+	}
+
+	cBlueBold.Printf("Details of profile %s\n", profileName)
+	cCyanBold.Print("OS     : ")
+	fmt.Println(profile.OS)
+	cCyanBold.Print("Arch   : ")
+	fmt.Println(profile.Arch)
+	cCyanBold.Print("Static : ")
+	fmt.Println(profile.Static)
+	cCyanBold.Print("Qmake  : ")
+	fmt.Println(profile.Qmake)
+	cCyanBold.Print("Moc    : ")
+	fmt.Println(profile.Moc)
+	cCyanBold.Print("Rcc    : ")
+	fmt.Println(profile.Rcc)
+	cCyanBold.Print("Gcc    : ")
+	fmt.Println(profile.Gcc)
+	cCyanBold.Print("G++    : ")
+	fmt.Println(profile.Gxx)
 }
