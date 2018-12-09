@@ -22,6 +22,7 @@ var cmdBuild = &cobra.Command{
 func init() {
 	cmdBuild.Flags().StringP("output", "o", "", "location for executable file")
 	cmdBuild.Flags().StringP("profile", "p", "", "profile that used for building app")
+	cmdBuild.Flags().BoolP("install", "i", false, "install app to $GOBIN directory")
 	cmdBuild.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
 }
 
@@ -33,6 +34,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	buildTags, _ := cmd.Flags().GetStringSlice("tags")
 	outputPath, _ := cmd.Flags().GetString("output")
 	profileName, _ := cmd.Flags().GetString("profile")
+	installApp, _ := cmd.Flags().GetBool("install")
 
 	// Get destination directory
 	dstDir := ""
@@ -87,10 +89,10 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 	cGreen.Println("done")
 
-	// Generate cgo file for binding in qamel directory
 	os.Remove(fp.Join(qamelDir, "qamel_plugin_import.cpp"))
 	os.Remove(fp.Join(qamelDir, "qamel_qml_plugin_import.cpp"))
 
+	// Generate cgo file for binding in qamel directory
 	err = generator.CreateCgoFile(profile, qamelDir, "")
 	if err != nil {
 		fmt.Println()
@@ -122,7 +124,11 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Run go build
 	fmt.Print("Building app...")
 	cmdArgs := []string{"build"}
-	if outputPath != "" {
+	if installApp {
+		cmdArgs = []string{"install"}
+	}
+
+	if !installApp && outputPath != "" {
 		cmdArgs = append(cmdArgs, "-o", outputPath)
 	}
 
