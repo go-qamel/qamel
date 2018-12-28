@@ -6,9 +6,9 @@
 *.qmlc
 moc-*.h
 qamel-*.go
+qamel-*.cpp
 qamel/qamel*
 *_plugin_import.cpp
 
 # Exclude sample executable
-sample/sample
-sample/sample.exe
+example/hello-world*
