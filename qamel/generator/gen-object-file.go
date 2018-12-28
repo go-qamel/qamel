@@ -430,13 +430,13 @@ func createGoFile(obj object) error {
 
 	// Write struct member function
 	// for manipulating properties
-	result += "// getter and setter\n"
+	result += "// getter and setter\n\n"
 	for _, prop := range obj.properties {
 		propName := upperChar(prop.name, 0)
 
 		// getter
 		result += fmt.Sprintf(""+
-			"func (obj %s) %s() (propValue %s) {\n"+
+			"func (obj *%s) %s() (propValue %s) {\n"+
 			"if obj.Ptr == nil || !qamel.ObjectExists(obj.Ptr) {\n"+
 			"return\n"+
 			"}\n\n"+
@@ -449,7 +449,7 @@ func createGoFile(obj object) error {
 
 		// setter
 		result += fmt.Sprintf(""+
-			"func (obj %s) set%s(new%s %s) {\n"+
+			"func (obj *%s) set%s(new%s %s) {\n"+
 			"if obj.Ptr == nil || !qamel.ObjectExists(obj.Ptr) {\n"+
 			"return\n"+
 			"}\n\n"+
@@ -466,7 +466,7 @@ func createGoFile(obj object) error {
 	}
 
 	// for invoking signals
-	result += "// signals invoker\n"
+	result += "// signals invoker\n\n"
 	for _, signal := range obj.signals {
 		params := []string{}
 		castedNames := []string{"obj.Ptr"}
@@ -487,7 +487,7 @@ func createGoFile(obj object) error {
 		}
 
 		result += fmt.Sprintf(""+
-			"func (obj %s) %s(%s) {\n"+
+			"func (obj *%s) %s(%s) {\n"+
 			"if obj.Ptr == nil || !qamel.ObjectExists(obj.Ptr) {\n"+
 			"return\n"+
 			"}\n\n"+
