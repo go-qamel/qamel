@@ -24,14 +24,15 @@ var (
 )
 
 type object struct {
-	name        string
-	dirPath     string
-	fileName    string
-	packageName string
-	structNode  *ast.StructType
-	properties  []objectMember
-	signals     []objectMethod
-	slots       []objectMethod
+	name         string
+	dirPath      string
+	fileName     string
+	packageName  string
+	structNode   *ast.StructType
+	constructors []objectMethod
+	properties   []objectMember
+	signals      []objectMethod
+	slots        []objectMethod
 }
 
 type objectMember struct {
@@ -221,6 +222,7 @@ func parseQmlObject(obj object) (object, []error) {
 	slots := []objectMethod{}
 	signals := []objectMethod{}
 	properties := []objectMember{}
+	constructors := []objectMethod{}
 
 	nPropName := map[string]int{}
 	nSignalName := map[string]int{}
@@ -245,13 +247,14 @@ func parseQmlObject(obj object) (object, []error) {
 		propName := strings.TrimSpace(structTag.Get("property"))
 		signalName := strings.TrimSpace(structTag.Get("signal"))
 		slotName := strings.TrimSpace(structTag.Get("slot"))
-		mergedName := propName + signalName + slotName
+		constructorName := strings.TrimSpace(structTag.Get("constructor"))
+		mergedName := propName + signalName + slotName + constructorName
 
 		if mergedName == "" {
 			continue
 		}
 
-		if mergedName != propName && mergedName != signalName && mergedName != slotName {
+		if mergedName != propName && mergedName != signalName && mergedName != slotName && mergedName != constructorName {
 			err := fmt.Errorf("object %s: a field must be only used for one purpose", obj.name)
 			errors = append(errors, err)
 			continue
@@ -286,6 +289,46 @@ func parseQmlObject(obj object) (object, []error) {
 			})
 
 			nPropName[propName]++
+			continue
+		}
+
+		// Check if it's constructor
+		if isFunc && constructorName != "" {
+			if !isBlankField {
+				err := fmt.Errorf("object %s, constructor %s: must be a single blank field", obj.name, constructorName)
+				errors = append(errors, err)
+				continue
+			}
+
+			if err := validateTagName(constructorName); err != nil {
+				err = fmt.Errorf("object %s, constructor %s: %v", obj.name, constructorName, err)
+				errors = append(errors, err)
+				continue
+			}
+
+			if len(constructors) > 0 {
+				err := fmt.Errorf("object %s, constructor %s: other constructor has been declared before", obj.name, constructorName)
+				errors = append(errors, err)
+				continue
+			}
+
+			if funcField.Results != nil {
+				err := fmt.Errorf("object %s, constructor %s: must not have return value", obj.name, constructorName)
+				errors = append(errors, err)
+				continue
+			}
+
+			parameters := parseAstFuncParams(funcField.Params)
+			if len(parameters) > 0 {
+				err := fmt.Errorf("object %s, constructor %s: must not have any parameter", obj.name, constructorName)
+				errors = append(errors, err)
+				continue
+			}
+
+			constructors = append(constructors, objectMethod{
+				name: constructorName,
+			})
+
 			continue
 		}
 
@@ -388,6 +431,7 @@ func parseQmlObject(obj object) (object, []error) {
 		obj.slots = slots
 		obj.signals = signals
 		obj.properties = properties
+		obj.constructors = constructors
 	}
 
 	return obj, errors

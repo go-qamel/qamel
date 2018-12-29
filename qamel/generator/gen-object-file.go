@@ -366,8 +366,14 @@ func createGoFile(obj object) error {
 		"func qamel%sConstructor(ptr unsafe.Pointer) {\n"+
 		"obj := &%s{}\n"+
 		"obj.Ptr = ptr\n"+
-		"qamel.RegisterObject(ptr, obj)\n"+
-		"}\n\n", cClassName, cClassName, obj.name)
+		"qamel.RegisterObject(ptr, obj)\n",
+		cClassName, cClassName, obj.name)
+
+	if len(obj.constructors) == 1 {
+		result += fmt.Sprintf("obj.%s()\n", obj.constructors[0].name)
+	}
+
+	result += "}\n\n"
 
 	// Write function for C destroyer
 	result += fmt.Sprintf(""+
