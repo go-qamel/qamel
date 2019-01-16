@@ -98,8 +98,26 @@ func createCgoFlags(profile config.Profile, dstDir string) (string, error) {
 		qmakeSpec = "win32-g++"
 	}
 
+	gccDir := fp.Dir(profile.Gcc)
+	gxxDir := fp.Dir(profile.Gxx)
+	envPath := os.Getenv("PATH")
+	pathSeparator := ":"
+
+	if profile.OS == "windows" {
+		pathSeparator = ";"
+	}
+
+	if fileExists(profile.Gcc) {
+		envPath = fmt.Sprintf(`%s%s%s`, gccDir, pathSeparator, envPath)
+	}
+
+	if fileExists(profile.Gxx) && gxxDir != gccDir {
+		envPath = fmt.Sprintf(`%s%s%s`, gxxDir, pathSeparator, envPath)
+	}
+
 	cmdQmake := exec.Command(profile.Qmake, "-o", makeFilePath, "-spec", qmakeSpec, proFilePath)
 	cmdQmake.Dir = dstDir
+	cmdQmake.Env = append(os.Environ(), "PATH="+envPath)
 	if btOutput, err := cmdQmake.CombinedOutput(); err != nil {
 		return "", fmt.Errorf("%v\n%s", err, btOutput)
 	}

@@ -91,6 +91,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	os.Remove(fp.Join(qamelDir, "qamel_qml_plugin_import.cpp"))
 
 	// Generate cgo file for binding in qamel directory
+	fmt.Print("Generating cgo file...")
 	err = generator.CreateCgoFile(profile, qamelDir, "")
 	if err != nil {
 		fmt.Println()
