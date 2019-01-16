@@ -239,6 +239,25 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 		gxxPath = defaultGxx
 	}
 
+	// If Windows, specify path to windres
+	// which will be used to create icon for the executable
+	windresPath := ""
+	if targetOS == "windows" {
+		fmt.Println()
+		fmt.Println("Since you are targeting Windows, you might want to set icon for your executable file. " +
+			"To do so, please specify the *full path* to windres on your system. " +
+			"It's usually located in the directory where MinGW is installed.")
+		fmt.Println()
+
+		cCyanBold.Print("Path to windres : ")
+		windresPath, _ = reader.ReadString('\n')
+		windresPath = strings.TrimSpace(windresPath)
+		if !fileExists(windresPath) {
+			cRedBold.Println("The specified path does not exist")
+			os.Exit(1)
+		}
+	}
+
 	// Generating moc file for viewer
 	fmt.Println()
 	fmt.Print("Generating some code for binding...")
@@ -263,14 +282,15 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	}
 
 	profiles[profileName] = config.Profile{
-		OS:     targetOS,
-		Arch:   targetArch,
-		Static: staticMode == "y",
-		Qmake:  qmakePath,
-		Moc:    mocPath,
-		Rcc:    rccPath,
-		Gcc:    gccPath,
-		Gxx:    gxxPath,
+		OS:      targetOS,
+		Arch:    targetArch,
+		Static:  staticMode == "y",
+		Qmake:   qmakePath,
+		Moc:     mocPath,
+		Rcc:     rccPath,
+		Gcc:     gccPath,
+		Gxx:     gxxPath,
+		Windres: windresPath,
 	}
 
 	err = config.SaveProfiles(configPath, profiles)
@@ -352,20 +372,25 @@ func profilePrintHandler(cmd *cobra.Command, args []string) {
 	}
 
 	cBlueBold.Printf("Details of profile %s\n", profileName)
-	cCyanBold.Print("OS     : ")
+	cCyanBold.Print("OS      : ")
 	fmt.Println(profile.OS)
-	cCyanBold.Print("Arch   : ")
+	cCyanBold.Print("Arch    : ")
 	fmt.Println(profile.Arch)
-	cCyanBold.Print("Static : ")
+	cCyanBold.Print("Static  : ")
 	fmt.Println(profile.Static)
-	cCyanBold.Print("Qmake  : ")
+	cCyanBold.Print("Qmake   : ")
 	fmt.Println(profile.Qmake)
-	cCyanBold.Print("Moc    : ")
+	cCyanBold.Print("Moc     : ")
 	fmt.Println(profile.Moc)
-	cCyanBold.Print("Rcc    : ")
+	cCyanBold.Print("Rcc     : ")
 	fmt.Println(profile.Rcc)
-	cCyanBold.Print("Gcc    : ")
+	cCyanBold.Print("Gcc     : ")
 	fmt.Println(profile.Gcc)
-	cCyanBold.Print("G++    : ")
+	cCyanBold.Print("G++     : ")
 	fmt.Println(profile.Gxx)
+
+	if profile.OS == "windows" {
+		cCyanBold.Print("Windres : ")
+		fmt.Println(profile.Windres)
+	}
 }

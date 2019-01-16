@@ -9,6 +9,9 @@ import (
 	"github.com/RadhiFadlillah/qamel/qamel/config"
 )
 
+// ErrNoResourceDir is error that fired when resource directory doesn't exist
+var ErrNoResourceDir = fmt.Errorf("resource directory doesn't exist")
+
 // CreateRccFile creates rcc.cpp file from resource directory at `dstDir/res`
 func CreateRccFile(profile config.Profile, dstDir string) error {
 	// Create cgo file
@@ -20,7 +23,7 @@ func CreateRccFile(profile config.Profile, dstDir string) error {
 	// Check if resource directory is exist
 	resDir := fp.Join(dstDir, "res")
 	if !dirExists(resDir) {
-		return fmt.Errorf("resource directory doesn't exist")
+		return ErrNoResourceDir
 	}
 
 	// Get list of file inside resource dir
@@ -41,15 +44,7 @@ func CreateRccFile(profile config.Profile, dstDir string) error {
 
 	// Create temp qrc file
 	qrcPath := fp.Join(dstDir, "qamel.qrc")
-	qrcFile, err := os.Create(qrcPath)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		qrcFile.Close()
-		os.Remove(qrcPath)
-	}()
+	defer os.Remove(qrcPath)
 
 	qrcContent := fmt.Sprintln(`<!DOCTYPE RCC><RCC version="1.0">`)
 	qrcContent += fmt.Sprintln(`<qresource>`)
@@ -59,11 +54,10 @@ func CreateRccFile(profile config.Profile, dstDir string) error {
 	qrcContent += fmt.Sprintln(`</qresource>`)
 	qrcContent += fmt.Sprintln(`</RCC>`)
 
-	_, err = qrcFile.WriteString(qrcContent)
+	err = saveToFile(qrcPath, qrcContent)
 	if err != nil {
 		return err
 	}
-	qrcFile.Sync()
 
 	// Run rcc
 	dst := fp.Join(dstDir, "qamel-rcc.cpp")

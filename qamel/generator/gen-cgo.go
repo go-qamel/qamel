@@ -42,12 +42,6 @@ func CreateCgoFile(profile config.Profile, dstDir string, pkgName string) error 
 
 	// Create destination file
 	fileName := fp.Join(dstDir, "qamel-cgo-"+pkgName+".go")
-	dstFile, err := os.Create(fileName)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
 	fileContent := fmt.Sprintln("package " + pkgName)
 	fileContent += fmt.Sprintln()
 	fileContent += fmt.Sprintln("/*")
@@ -55,12 +49,7 @@ func CreateCgoFile(profile config.Profile, dstDir string, pkgName string) error 
 	fileContent += fmt.Sprintln("*/")
 	fileContent += fmt.Sprintln(`import "C"`)
 
-	_, err = dstFile.WriteString(fileContent)
-	if err != nil {
-		return err
-	}
-
-	return dstFile.Sync()
+	return saveToFile(fileName, fileContent)
 }
 
 // createCgoFlags creates cgo flags by using qmake
@@ -73,17 +62,10 @@ func createCgoFlags(profile config.Profile, dstDir string) (string, error) {
 	}
 
 	proFilePath := fp.Join(dstDir, "qamel.pro")
-	proFile, err := os.Create(proFilePath)
+	err := saveToFile(proFilePath, proContent)
 	if err != nil {
 		return "", err
 	}
-	defer proFile.Close()
-
-	_, err = proFile.WriteString(proContent)
-	if err != nil {
-		return "", err
-	}
-	proFile.Sync()
 
 	// Create makefile from project file using qmake
 	makeFilePath := fp.Join(dstDir, "qamel.makefile")

@@ -13,11 +13,12 @@ type Profile struct {
 	Arch   string
 	Static bool
 
-	Qmake string
-	Moc   string
-	Rcc   string
-	Gcc   string
-	Gxx   string
+	Qmake   string
+	Moc     string
+	Rcc     string
+	Gcc     string
+	Gxx     string
+	Windres string
 }
 
 // LoadProfiles load all profiles inside config file in ${XDG_CONFIG_HOME}/qamel/config

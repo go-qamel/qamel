@@ -82,11 +82,13 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	fmt.Print("Removing old build files...")
 	err = removeQamelFiles(dstDir)
 	if err != nil {
+		fmt.Println()
 		cRedBold.Println("Failed to remove old build files:", err)
 		os.Exit(1)
 	}
 	cGreen.Println("done")
 
+	os.Remove(fp.Join(dstDir, "qamel-icon.syso"))
 	os.Remove(fp.Join(qamelDir, "qamel_plugin_import.cpp"))
 	os.Remove(fp.Join(qamelDir, "qamel_qml_plugin_import.cpp"))
 
@@ -98,14 +100,38 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		cRedBold.Println("Failed to create cgo file:", err)
 		os.Exit(1)
 	}
+	cGreen.Println("done")
 
 	// Create rcc file
 	fmt.Print("Generating Qt resource file...")
 	err = generator.CreateRccFile(profile, dstDir)
 	if err != nil {
-		cYellow.Println(err)
+		if err == generator.ErrNoResourceDir {
+			cYellow.Println(err)
+		} else {
+			fmt.Println()
+			cRedBold.Println("Failed to create Qt resource file:", err)
+			os.Exit(1)
+		}
 	} else {
 		cGreen.Println("done")
+	}
+
+	// Create syso file
+	if profile.OS == "windows" && profile.Windres != "" {
+		fmt.Print("Generating syso file...")
+		err = generator.CreateSysoFile(profile, dstDir)
+		if err != nil {
+			if err == generator.ErrNoIcon {
+				cYellow.Println(err)
+			} else {
+				fmt.Println()
+				cRedBold.Println("Failed to create syso file:", err)
+				os.Exit(1)
+			}
+		} else {
+			cGreen.Println("done")
+		}
 	}
 
 	// Generate code for QmlObject structs
