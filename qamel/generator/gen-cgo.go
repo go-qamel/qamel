@@ -109,19 +109,6 @@ func createCgoFlags(profile config.Profile, dstDir string) (string, error) {
 	if profile.OS == "windows" {
 		qmakeResultPath += ".Release"
 	}
-	
-	// Go does not support big-obj files yet (see https://github.com/golang/go/issues/24341),
-	// but qmake uses them by default under Windows.
-	// We patch the makefile to remove the flag.
-	read, err := ioutil.ReadFile(qmakeResultPath)
-	if err != nil {
-		return "", err
-	}
-	newContents := strings.Replace(string(read), " -Wa,-mbig-obj ", " ", -1)
-	err = ioutil.WriteFile(qmakeResultPath, []byte(newContents), 0)
-	if err != nil {
-		return "", err
-	}
 
 	mapCompiler := map[string]string{}
 	makeFile, err := os.Open(qmakeResultPath)
@@ -154,6 +141,9 @@ func createCgoFlags(profile config.Profile, dstDir string) (string, error) {
 			flagValue = strings.Replace(flagValue, variable, variableValue, -1)
 		}
 
+		// Go does not support big-obj files yet (see https://github.com/golang/go/issues/24341).
+		// However, qmake in mingw64 uses them by default. To bypass it, we need to remove `-Wa,-mbig-obj` flags.
+		flagValue = strings.Replace(flagValue, " -Wa,-mbig-obj ", " ", -1)
 		mapCompiler[flagKey] = strings.TrimSpace(flagValue)
 	}
 
