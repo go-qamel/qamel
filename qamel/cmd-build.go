@@ -34,30 +34,30 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	outputPath, _ := cmd.Flags().GetString("output")
 	profileName, _ := cmd.Flags().GetString("profile")
 
-	// Get destination directory
-	dstDir := ""
+	// Get project directory
+	projectDir := ""
 	if len(args) == 1 {
-		dstDir = args[0]
+		projectDir = args[0]
 	}
 
-	// If destination directory is empty, use current working directory
-	// Else, make sure destination dir is exists
-	if dstDir == "" {
+	// If project directory is empty, use current working directory
+	// Else, make sure project dir is exists
+	if projectDir == "" {
 		var err error
-		dstDir, err = os.Getwd()
+		projectDir, err = os.Getwd()
 		if err != nil {
 			cRedBold.Println("Failed to get current working dir:", err)
 			os.Exit(1)
 		}
-	} else if !dirExists(dstDir) {
+	} else if !dirExists(projectDir) {
 		cRedBold.Println("Destination directory doesn't exist")
 		os.Exit(1)
 	}
 
-	// Make sure destination dir is absolute
-	dstDir, err := fp.Abs(dstDir)
+	// Make sure project dir is absolute
+	projectDir, err := fp.Abs(projectDir)
 	if err != nil {
-		cRedBold.Println("Failed to get destination dir:", err)
+		cRedBold.Println("Failed to get project dir:", err)
 		os.Exit(1)
 	}
 
@@ -80,7 +80,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Remove old qamel files
 	fmt.Print("Removing old build files...")
-	err = removeQamelFiles(dstDir)
+	err = removeQamelFiles(projectDir)
 	if err != nil {
 		fmt.Println()
 		cRedBold.Println("Failed to remove old build files:", err)
@@ -88,7 +88,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 	cGreen.Println("done")
 
-	os.Remove(fp.Join(dstDir, "qamel-icon.syso"))
+	os.Remove(fp.Join(projectDir, "qamel-icon.syso"))
 	os.Remove(fp.Join(qamelDir, "qamel_plugin_import.cpp"))
 	os.Remove(fp.Join(qamelDir, "qamel_qml_plugin_import.cpp"))
 
@@ -104,7 +104,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Create rcc file
 	fmt.Print("Generating Qt resource file...")
-	err = generator.CreateRccFile(profile, dstDir)
+	err = generator.CreateRccFile(profile, projectDir)
 	if err != nil {
 		if err == generator.ErrNoResourceDir {
 			cYellow.Println(err)
@@ -120,7 +120,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Create syso file
 	if profile.OS == "windows" && profile.Windres != "" {
 		fmt.Print("Generating syso file...")
-		err = generator.CreateSysoFile(profile, dstDir)
+		err = generator.CreateSysoFile(profile, projectDir)
 		if err != nil {
 			if err == generator.ErrNoIcon {
 				cYellow.Println(err)
@@ -136,7 +136,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	// Generate code for QmlObject structs
 	fmt.Print("Generating code for QML objects...")
-	errs := generator.CreateQmlObjectCode(profile, dstDir, buildTags...)
+	errs := generator.CreateQmlObjectCode(profile, projectDir, buildTags...)
 	if errs != nil && len(errs) > 0 {
 		fmt.Println()
 		for _, err := range errs {
@@ -168,7 +168,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	cmdArgs = append(cmdArgs, ldFlags)
 
 	cmdGo := exec.Command("go", cmdArgs...)
-	cmdGo.Dir = dstDir
+	cmdGo.Dir = projectDir
 	cmdGo.Env = append(os.Environ(),
 		`CGO_ENABLED=1`,
 		`CGO_CFLAGS_ALLOW=.*`,
@@ -187,6 +187,18 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 	cGreen.Println("done")
+
+	// If it's shared mode, copy dependencies
+	if !profile.Static {
+		fmt.Print("Copying dependencies...")
+		err = generator.CopyDependencies(profile, projectDir, outputPath)
+		if err != nil {
+			fmt.Println()
+			cRedBold.Println("Failed to copy dependencies:", err)
+			os.Exit(1)
+		}
+		cGreen.Println("done")
+	}
 
 	// Build finished
 	fmt.Println()

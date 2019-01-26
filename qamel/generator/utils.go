@@ -24,6 +24,12 @@ func dirExists(dirPath string) bool {
 	return !os.IsNotExist(err) && info.IsDir()
 }
 
+// fileDirExists checks if the file or dir in specified path is exists
+func fileDirExists(filePath string) bool {
+	_, err := os.Stat(filePath)
+	return !os.IsNotExist(err)
+}
+
 // dirEmpty checks if the directory in specified path is EMPTY
 func dirEmpty(dirPath string) bool {
 	f, err := os.Open(dirPath)
@@ -126,4 +132,68 @@ func saveToFile(dstPath string, content string) error {
 	}
 
 	return dstFile.Sync()
+}
+
+// copyFile copies file from srcPath to dstPath
+func copyFile(srcPath, dstPath string) error {
+	os.MkdirAll(fp.Dir(dstPath), os.ModePerm)
+
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, src)
+	return err
+}
+
+// copyDir copies dir from srcPath to dstPath
+func copyDir(srcPath, dstPath string) error {
+	os.MkdirAll(fp.Dir(dstPath), os.ModePerm)
+
+	fds, err := ioutil.ReadDir(srcPath)
+	if err != nil {
+		return err
+	}
+
+	for _, fd := range fds {
+		srcfp := fp.Join(srcPath, fd.Name())
+		dstfp := fp.Join(dstPath, fd.Name())
+
+		if fd.IsDir() {
+			err = copyDir(srcfp, dstfp)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = copyFile(srcfp, dstfp)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// copyFileDir is wrapper for both copyFile and copyDir.
+// Useful when you don't care whether src is file or directory
+func copyFileDir(srcPath, dstPath string) error {
+	stat, err := os.Stat(srcPath)
+	if err != nil {
+		return err
+	}
+
+	if stat.IsDir() {
+		return copyDir(srcPath, dstPath)
+	}
+
+	return copyFile(srcPath, dstPath)
 }

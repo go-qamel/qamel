@@ -19,6 +19,7 @@ type Profile struct {
 	Gcc     string
 	Gxx     string
 	Windres string
+	Objdump string
 }
 
 // LoadProfiles load all profiles inside config file in ${XDG_CONFIG_HOME}/qamel/config

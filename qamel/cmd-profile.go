@@ -215,13 +215,15 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	// Fetch custom C and C++ compiler
 	defaultGcc := "gcc"
 	defaultGxx := "g++"
+	defaultObjdump := "objdump"
 	if runtime.GOOS == "windows" {
 		defaultGcc += ".exe"
 		defaultGxx += ".exe"
+		defaultObjdump += ".exe"
 	}
 
 	fmt.Println()
-	fmt.Println("Please specify the *full path* to your C and C++ compiler.")
+	fmt.Println("Please specify the *full path* to your compiler.")
 	fmt.Println("Keep it empty to use the default compiler on your system.")
 	fmt.Println()
 
@@ -237,6 +239,17 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	gxxPath = strings.TrimSpace(gxxPath)
 	if gxxPath == "" {
 		gxxPath = defaultGxx
+	}
+
+	// If Windows shared, specify path to objdump, which used to fetch dependencies
+	objdumpPath := ""
+	if targetOS == "windows" && staticMode != "y" {
+		cCyanBold.Printf("Objdump (default %s) : ", defaultObjdump)
+		objdumpPath, _ = reader.ReadString('\n')
+		objdumpPath = strings.TrimSpace(objdumpPath)
+		if objdumpPath == "" {
+			objdumpPath = defaultObjdump
+		}
 	}
 
 	// If Windows, specify path to windres
@@ -291,6 +304,7 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 		Gcc:     gccPath,
 		Gxx:     gxxPath,
 		Windres: windresPath,
+		Objdump: objdumpPath,
 	}
 
 	err = config.SaveProfiles(configPath, profiles)
@@ -390,6 +404,8 @@ func profilePrintHandler(cmd *cobra.Command, args []string) {
 	fmt.Println(profile.Gxx)
 
 	if profile.OS == "windows" {
+		cCyanBold.Print("Objdump : ")
+		fmt.Println(profile.Objdump)
 		cCyanBold.Print("Windres : ")
 		fmt.Println(profile.Windres)
 	}
