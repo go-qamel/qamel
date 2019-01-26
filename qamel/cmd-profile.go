@@ -244,7 +244,7 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	// If Windows shared, specify path to objdump, which used to fetch dependencies
 	objdumpPath := ""
 	if targetOS == "windows" && staticMode != "y" {
-		cCyanBold.Printf("Objdump (default %s) : ", defaultObjdump)
+		cCyanBold.Printf("Objdump (default %s)  : ", defaultObjdump)
 		objdumpPath, _ = reader.ReadString('\n')
 		objdumpPath = strings.TrimSpace(objdumpPath)
 		if objdumpPath == "" {
