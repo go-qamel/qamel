@@ -41,23 +41,21 @@ func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 	// The first one is the output binary file
 	filesToCheck := []string{outputPath}
 
-	// The plugins library (*.so) must be checked as well
+	// The plugins and qml libraries (*.so) which copied before
+	// must be checked as well
 	outputDir := fp.Dir(outputPath)
-	dstPluginsDir := fp.Join(outputDir, "plugins")
-	if dirExists(dstPluginsDir) {
-		fp.Walk(dstPluginsDir, func(path string, info os.FileInfo, err error) error {
-			if info.IsDir() {
-				return nil
-			}
-
-			fileExt := fp.Ext(info.Name())
-			if strings.HasPrefix(fileExt, ".so") {
-				filesToCheck = append(filesToCheck, path)
-			}
-
+	fp.Walk(outputDir, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
 			return nil
-		})
-	}
+		}
+
+		fileExt := fp.Ext(info.Name())
+		if strings.HasPrefix(fileExt, ".so") {
+			filesToCheck = append(filesToCheck, path)
+		}
+
+		return nil
+	})
 
 	// Get list of dependency of the files
 	qtLibsDir := qmakeVars["QT_INSTALL_LIBS"]
