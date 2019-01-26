@@ -58,7 +58,12 @@ func copyLinuxDependencies(qmakeVars map[string]string, outputPath string) error
 		return err
 	}
 
-	return copyLinuxLibs(qmakeVars, outputPath)
+	err = copyLinuxLibs(qmakeVars, outputPath)
+	if err != nil {
+		return err
+	}
+
+	return createLinuxScript(outputPath)
 }
 
 // copyWindowsDependencies copies dependecies files for Windows target

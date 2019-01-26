@@ -123,3 +123,43 @@ func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 
 	return nil
 }
+
+func createLinuxScript(outputPath string) error {
+	// Prepare content of the script
+	scriptContent := "" +
+		"#!/bin/bash\n" +
+		"appname=`basename $0 | sed s,\\.sh$,,`\n\n" +
+		"dirname=`dirname $0`\n" +
+		"tmp=\"${dirname#?}\"\n\n" +
+		"if [ \"${dirname%$tmp}\" != \"/\" ]; then\n" +
+		"dirname=$PWD/$dirname\n" +
+		"fi\n" +
+		"export LD_LIBRARY_PATH=\"$dirname/libs\"\n" +
+		"export QT_PLUGIN_PATH=\"$dirname/plugins\"\n" +
+		"export QML_IMPORT_PATH=\"$dirname/qml\"\n" +
+		"export QML2_IMPORT_PATH=\"$dirname/qml\"\n" +
+		"$dirname/$appname \"$@\"\n"
+
+	// If scripts already exists, remove it
+	scriptPath := strings.TrimSuffix(outputPath, fp.Ext(outputPath))
+	scriptPath += ".sh"
+
+	err := os.Remove(scriptPath)
+	if err != nil {
+		return err
+	}
+
+	// Write script to file
+	dstFile, err := os.OpenFile(scriptPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	_, err = dstFile.WriteString(scriptContent)
+	if err != nil {
+		return err
+	}
+
+	return dstFile.Sync()
+}
