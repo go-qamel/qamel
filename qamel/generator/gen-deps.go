@@ -35,7 +35,8 @@ func CopyDependencies(profile config.Profile, projectDir, outputPath string) err
 	}
 
 	// Copy QML
-	err = copyQmlDependencies(qmakeVars, profile, projectDir, outputPath)
+	outputDir := fp.Dir(outputPath)
+	err = copyQmlDependencies(qmakeVars, profile, projectDir, outputDir)
 	if err != nil {
 		return err
 	}

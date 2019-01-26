@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// copyLinuxPlugins copies Linux plugins to output directory
 func copyLinuxPlugins(qmakeVars map[string]string, outputDir string) error {
 	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
 	dstPluginsDir := fp.Join(outputDir, "plugins")
@@ -36,6 +37,7 @@ func copyLinuxPlugins(qmakeVars map[string]string, outputDir string) error {
 	return nil
 }
 
+// copyLinuxLibs copies Linux libraries to output directory
 func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 	// Get list of files to check.
 	// The first one is the output binary file
@@ -122,6 +124,7 @@ func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 	return nil
 }
 
+// createLinuxScripts creates wrapper script to run the executable
 func createLinuxScript(outputPath string) error {
 	// Prepare content of the script
 	scriptContent := "" +
@@ -138,16 +141,11 @@ func createLinuxScript(outputPath string) error {
 		"export QML2_IMPORT_PATH=\"$dirname/qml\"\n" +
 		"$dirname/$appname \"$@\"\n"
 
-	// If scripts already exists, remove it
+	// Write script to file. If it already exists, remove it.
 	scriptPath := strings.TrimSuffix(outputPath, fp.Ext(outputPath))
 	scriptPath += ".sh"
 
-	err := os.Remove(scriptPath)
-	if err != nil {
-		return err
-	}
-
-	// Write script to file
+	os.Remove(scriptPath)
 	dstFile, err := os.OpenFile(scriptPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777)
 	if err != nil {
 		return err

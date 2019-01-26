@@ -48,15 +48,15 @@ type objectMethod struct {
 
 // CreateQmlObjectCode generates Go code and C++ code for all QmlObject
 // in specified directory
-func CreateQmlObjectCode(profile config.Profile, dirPath string, buildTags ...string) []error {
-	// Make sure dir is exists
-	if !dirExists(dirPath) {
-		err := fmt.Errorf("directory %s doesn't exist", dirPath)
+func CreateQmlObjectCode(profile config.Profile, projectDir string, buildTags ...string) []error {
+	// Make sure project directory is exists
+	if !dirExists(projectDir) {
+		err := fmt.Errorf("directory %s doesn't exist", projectDir)
 		return []error{err}
 	}
 
 	// Find all sub directories, including the root dir
-	subDirs, err := getSubDirs(dirPath)
+	subDirs, err := getSubDirs(projectDir)
 	if err != nil {
 		return []error{err}
 	}

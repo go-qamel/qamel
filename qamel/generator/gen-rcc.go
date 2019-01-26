@@ -12,16 +12,16 @@ import (
 // ErrNoResourceDir is error that fired when resource directory doesn't exist
 var ErrNoResourceDir = fmt.Errorf("resource directory doesn't exist")
 
-// CreateRccFile creates rcc.cpp file from resource directory at `dstDir/res`
-func CreateRccFile(profile config.Profile, dstDir string) error {
+// CreateRccFile creates rcc.cpp file from resource directory at `projectDir/res`
+func CreateRccFile(profile config.Profile, projectDir string) error {
 	// Create cgo file
-	err := CreateCgoFile(profile, dstDir, "main")
+	err := CreateCgoFile(profile, projectDir, "main")
 	if err != nil {
 		return err
 	}
 
 	// Check if resource directory is exist
-	resDir := fp.Join(dstDir, "res")
+	resDir := fp.Join(projectDir, "res")
 	if !dirExists(resDir) {
 		return ErrNoResourceDir
 	}
@@ -33,7 +33,7 @@ func CreateRccFile(profile config.Profile, dstDir string) error {
 			return nil
 		}
 
-		path, _ = fp.Rel(dstDir, path)
+		path, _ = fp.Rel(projectDir, path)
 		resFiles = append(resFiles, path)
 		return nil
 	})
@@ -43,7 +43,7 @@ func CreateRccFile(profile config.Profile, dstDir string) error {
 	}
 
 	// Create temp qrc file
-	qrcPath := fp.Join(dstDir, "qamel.qrc")
+	qrcPath := fp.Join(projectDir, "qamel.qrc")
 	defer os.Remove(qrcPath)
 
 	qrcContent := fmt.Sprintln(`<!DOCTYPE RCC><RCC version="1.0">`)
@@ -60,7 +60,7 @@ func CreateRccFile(profile config.Profile, dstDir string) error {
 	}
 
 	// Run rcc
-	dst := fp.Join(dstDir, "qamel-rcc.cpp")
+	dst := fp.Join(projectDir, "qamel-rcc.cpp")
 	cmdRcc := exec.Command(profile.Rcc, "-o", dst, qrcPath)
 	btOutput, err := cmdRcc.CombinedOutput()
 	if err != nil {

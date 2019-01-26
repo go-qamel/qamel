@@ -13,7 +13,8 @@ import (
 
 var rxQmlImport = regexp.MustCompile(`^import\s+(Qt\S+)\s(\d)+.*$`)
 
-func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, projectDir, outputPath string) error {
+// copyQmlDependencies copies QML dependencies to output dir
+func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, projectDir, outputDir string) error {
 	// Get list of dir to check
 	dirToCheck := []string{}
 	projectResDir := fp.Join(projectDir, "res")
@@ -57,7 +58,7 @@ func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, pr
 	}
 
 	// Copy all dependency libs to output dir
-	dstQmlDir := fp.Dir(outputPath)
+	dstQmlDir := outputDir
 	if profile.OS != "windows" {
 		dstQmlDir = fp.Join(dstQmlDir, "qml")
 	}
@@ -108,6 +109,8 @@ func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, pr
 	return nil
 }
 
+// getQmlDependenciesFromDir gets all QML imports from *.qml files
+// inside specified directory
 func getQmlDependenciesFromDir(qtQmlDir string, srcDir string) ([]string, error) {
 	// Make sure dir existst
 	if !dirExists(srcDir) {
@@ -145,6 +148,8 @@ func getQmlDependenciesFromDir(qtQmlDir string, srcDir string) ([]string, error)
 	return results, nil
 }
 
+// getQmlDependenciesFromFile gets all QML imports from *.qml files
+// from the specified file
 func getQmlDependenciesFromFile(qtQmlDir string, qmlFilePath string) ([]string, error) {
 	// Open QML file
 	qmlFile, err := os.Open(qmlFilePath)

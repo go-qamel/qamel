@@ -12,6 +12,7 @@ import (
 	"github.com/RadhiFadlillah/qamel/qamel/config"
 )
 
+// copyWindowsPlugins copies Windows plugins to output directory
 func copyWindowsPlugins(qmakeVars map[string]string, outputDir string) error {
 	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
 	plugins := []string{
@@ -48,6 +49,7 @@ func copyWindowsPlugins(qmakeVars map[string]string, outputDir string) error {
 	return nil
 }
 
+// copyWindowsLibs copies Windows libraries to output directory
 func copyWindowsLibs(qmakeVars map[string]string, profile config.Profile, outputPath string) error {
 	// Get list of files to check.
 	// The first one is the output binary file
