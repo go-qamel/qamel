@@ -27,7 +27,7 @@ func copyLinuxPlugins(qmakeVars map[string]string, outputDir string) error {
 			continue
 		}
 
-		err := copyFileDir(srcPath, dstPath)
+		err := copyFileDir(srcPath, dstPath, nil)
 		if err != nil {
 			return err
 		}

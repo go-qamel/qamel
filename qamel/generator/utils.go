@@ -155,7 +155,7 @@ func copyFile(srcPath, dstPath string) error {
 }
 
 // copyDir copies dir from srcPath to dstPath
-func copyDir(srcPath, dstPath string) error {
+func copyDir(srcPath, dstPath string, isSkipped func(string, os.FileInfo) bool) error {
 	os.MkdirAll(fp.Dir(dstPath), os.ModePerm)
 
 	fds, err := ioutil.ReadDir(srcPath)
@@ -167,8 +167,12 @@ func copyDir(srcPath, dstPath string) error {
 		srcfp := fp.Join(srcPath, fd.Name())
 		dstfp := fp.Join(dstPath, fd.Name())
 
+		if isSkipped != nil && isSkipped(srcfp, fd) {
+			continue
+		}
+
 		if fd.IsDir() {
-			err = copyDir(srcfp, dstfp)
+			err = copyDir(srcfp, dstfp, isSkipped)
 			if err != nil {
 				return err
 			}
@@ -185,14 +189,14 @@ func copyDir(srcPath, dstPath string) error {
 
 // copyFileDir is wrapper for both copyFile and copyDir.
 // Useful when you don't care whether src is file or directory
-func copyFileDir(srcPath, dstPath string) error {
+func copyFileDir(srcPath, dstPath string, isSkipped func(string, os.FileInfo) bool) error {
 	stat, err := os.Stat(srcPath)
 	if err != nil {
 		return err
 	}
 
 	if stat.IsDir() {
-		return copyDir(srcPath, dstPath)
+		return copyDir(srcPath, dstPath, isSkipped)
 	}
 
 	return copyFile(srcPath, dstPath)

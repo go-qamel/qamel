@@ -27,7 +27,19 @@ func copyWindowsPlugins(qmakeVars map[string]string, outputDir string) error {
 			continue
 		}
 
-		err := copyFileDir(srcPath, dstPath)
+		err := copyFileDir(srcPath, dstPath, func(path string, info os.FileInfo) bool {
+			if strings.HasSuffix(info.Name(), "d.dll") {
+				tmpPath := strings.TrimSuffix(path, "d.dll")
+				tmpPath += ".dll"
+
+				if fileExists(tmpPath) {
+					return true
+				}
+			}
+
+			return false
+		})
+
 		if err != nil {
 			return err
 		}

@@ -82,7 +82,24 @@ func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, pr
 			return err
 		}
 
-		err = copyDir(qmlPath, fp.Join(dstQmlDir, dirName))
+		err = copyDir(qmlPath, fp.Join(dstQmlDir, dirName), func(path string, info os.FileInfo) bool {
+			fileExt := fp.Ext(info.Name())
+			if fileExt == ".qmlc" || fileExt == ".jsc" {
+				return true
+			}
+
+			if strings.HasSuffix(info.Name(), "d.dll") {
+				tmpPath := strings.TrimSuffix(path, "d.dll")
+				tmpPath += ".dll"
+
+				if fileExists(tmpPath) {
+					return true
+				}
+			}
+
+			return false
+		})
+
 		if err != nil {
 			return err
 		}
