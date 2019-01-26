@@ -84,7 +84,7 @@ func copyWindowsLibs(qmakeVars map[string]string, profile config.Profile, output
 		}
 
 		// Fetch dependencies using objdump
-		cmdObjdump := exec.Command("objdump", "-p", fileName)
+		cmdObjdump := exec.Command(profile.Objdump, "-p", fileName)
 		objdumpResult, err := cmdObjdump.CombinedOutput()
 		if err != nil {
 			continue

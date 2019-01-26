@@ -24,7 +24,7 @@ func CopyDependencies(profile config.Profile, projectDir, outputPath string) err
 	scanner := bufio.NewScanner(buffer)
 	qmakeVars := map[string]string{}
 	for scanner.Scan() {
-		parts := strings.Split(scanner.Text(), ":")
+		parts := strings.SplitN(scanner.Text(), ":", 2)
 		if len(parts) != 2 {
 			continue
 		}
