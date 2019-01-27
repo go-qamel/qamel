@@ -7,9 +7,14 @@ package qamel
 // #include "application.h"
 import "C"
 import (
+	"runtime"
 	"strings"
 	"unsafe"
 )
+
+func init() {
+	runtime.LockOSThread()
+}
 
 // Application is the main app which wraps QGuiApplication
 type Application struct {

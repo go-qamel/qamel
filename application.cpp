@@ -1,5 +1,4 @@
 #include "application.h"
-#include <QCoreApplication>
 #include <QApplication>
 #include <QFont>
 #include <QString>
@@ -16,12 +15,12 @@ void* App_NewApplication(int argc, char* argv) {
 		argvs[i] = (new QByteArray(aList.at(i)))->data();
 	}
 
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     return new QApplication(argcs, argvs);
 }
 
 void App_SetAttribute(long long attribute, bool on) {
-    QCoreApplication::setAttribute(Qt::ApplicationAttribute(attribute), on);
+    QApplication::setAttribute(Qt::ApplicationAttribute(attribute), on);
 }
 
 void App_SetFont(char *family, int pointSize, int weight, bool italic) {
