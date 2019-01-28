@@ -23,6 +23,7 @@ func init() {
 	cmdBuild.Flags().StringP("output", "o", "", "location for executable file")
 	cmdBuild.Flags().StringP("profile", "p", "", "profile that used for building app")
 	cmdBuild.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
+	cmdBuild.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
 }
 
 func buildHandler(cmd *cobra.Command, args []string) {
@@ -33,6 +34,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	buildTags, _ := cmd.Flags().GetStringSlice("tags")
 	outputPath, _ := cmd.Flags().GetString("output")
 	profileName, _ := cmd.Flags().GetString("profile")
+	copyDependencies, _ := cmd.Flags().GetBool("copy-deps")
 
 	// Get project directory
 	projectDir := ""
@@ -189,7 +191,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	cGreen.Println("done")
 
 	// If it's shared mode, copy dependencies
-	if !profile.Static {
+	if !profile.Static && copyDependencies {
 		fmt.Print("Copying dependencies...")
 		err = generator.CopyDependencies(profile, projectDir, outputPath)
 		if err != nil {
