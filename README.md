@@ -14,7 +14,7 @@ Qamel is a simple QML binding for Go, heavily inspired by [`therecipe/qt`](https
 
 ### Limitation
 
-- I've only tested this in Linux, so I can't vouch for other OS. It should works though, since the code itself is really simple.
+- I've only tested this in Linux and Windows, so I can't vouch for other OS. It should works though, since the code itself is really simple.
 - When declaring custom QML object, this binding only [supports](https://github.com/RadhiFadlillah/qamel/wiki/QmlObject-Documentation) basic data type, i.e. `int`, `int32`, `int64`, `float32`, `float64`, `bool` and `string`. For other data type like struct, array or map, you have to use `string` type and pass it as JSON value.
 - Thanks to Go and Qt, in theory, the app built using this binding can be cross compiled from and to Windows, Linux and MacOS. However, since I only have Linux PC, I only able to test cross compiling from Linux to Windows.
 
