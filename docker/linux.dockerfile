@@ -20,9 +20,10 @@ RUN apt-get -qq update && \
     apt-get -qq -y install dbus libfontconfig1 libx11-6 libx11-xcb1
 RUN curl -SL --retry 10 --retry-delay 60 -O https://download.qt.io/official_releases/qt/$QT_MAJOR/$QT_VERSION/qt-opensource-linux-x64-$QT_VERSION.run
 
-COPY installer-script.qs /
 RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
-    ./qt-opensource-linux-x64-$QT_VERSION.run -v --platform minimal --script installer-script.qs
+    ./qt-opensource-linux-x64-$QT_VERSION.run -v \
+        --script $GOPATH/src/github.com/RadhiFadlillah/qamel/docker/installer-script.qs \
+        --platform minimal
 
 # Clean up after installing Qt5
 RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
