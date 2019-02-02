@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	fp "path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/RadhiFadlillah/qamel/qamel/config"
@@ -85,7 +86,7 @@ func createCgoFlags(profile config.Profile, projectDir string) (string, error) {
 	envPath := os.Getenv("PATH")
 	pathSeparator := ":"
 
-	if profile.OS == "windows" {
+	if runtime.GOOS == "windows" {
 		pathSeparator = ";"
 	}
 
