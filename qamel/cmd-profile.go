@@ -404,8 +404,11 @@ func profilePrintHandler(cmd *cobra.Command, args []string) {
 	fmt.Println(profile.Gxx)
 
 	if profile.OS == "windows" {
-		cCyanBold.Print("Objdump : ")
-		fmt.Println(profile.Objdump)
+		if !profile.Static {
+			cCyanBold.Print("Objdump : ")
+			fmt.Println(profile.Objdump)
+		}
+
 		cCyanBold.Print("Windres : ")
 		fmt.Println(profile.Windres)
 	}
