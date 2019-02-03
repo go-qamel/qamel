@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	fp "path/filepath"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -27,4 +29,19 @@ func fileExists(filePath string) bool {
 func dirExists(dirPath string) bool {
 	info, err := os.Stat(dirPath)
 	return !os.IsNotExist(err) && info.IsDir()
+}
+
+// unixJoinPath is like filepath.Join, but the separator will always using front slash (/)
+func unixJoinPath(elem ...string) string {
+	result := fp.ToSlash(fp.Join(elem...))
+
+	// Convert C:/dir/name to /c/dir/name
+	volName := fp.VolumeName(result)
+	if volName != "" && strings.HasPrefix(result, volName) {
+		newVolName := "/" + strings.ToLower(volName)
+		newVolName = strings.TrimSuffix(newVolName, ":")
+		result = newVolName + strings.TrimPrefix(result, volName)
+	}
+
+	return result
 }
