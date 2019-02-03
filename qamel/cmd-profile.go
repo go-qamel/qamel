@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/RadhiFadlillah/qamel/qamel/config"
-	"github.com/RadhiFadlillah/qamel/qamel/generator"
 	"github.com/spf13/cobra"
 )
 
@@ -270,19 +269,6 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 		}
 	}
-
-	// Generating moc file for viewer
-	fmt.Println()
-	fmt.Print("Generating some code for binding...")
-
-	err := generator.CreateMocFile(mocPath, fp.Join(qamelDir, "viewer.cpp"))
-	if err != nil {
-		fmt.Println()
-		cRedBold.Println("Failed to create moc file for viewer:", err)
-		os.Exit(1)
-	}
-
-	cGreen.Println("done")
 
 	// Save config file
 	fmt.Printf("Saving profile %s...", profileName)
