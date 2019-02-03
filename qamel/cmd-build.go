@@ -15,7 +15,7 @@ import (
 var cmdBuild = &cobra.Command{
 	Use:   "build",
 	Short: "Build QML app",
-	Args:  cobra.MaximumNArgs(1),
+	Args:  cobra.NoArgs,
 	Run:   buildHandler,
 }
 
@@ -36,30 +36,10 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	profileName, _ := cmd.Flags().GetString("profile")
 	copyDependencies, _ := cmd.Flags().GetBool("copy-deps")
 
-	// Get project directory
-	projectDir := ""
-	if len(args) == 1 {
-		projectDir = args[0]
-	}
-
-	// If project directory is empty, use current working directory
-	// Else, make sure project dir is exists
-	if projectDir == "" {
-		var err error
-		projectDir, err = os.Getwd()
-		if err != nil {
-			cRedBold.Println("Failed to get current working dir:", err)
-			os.Exit(1)
-		}
-	} else if !dirExists(projectDir) {
-		cRedBold.Println("Destination directory doesn't exist")
-		os.Exit(1)
-	}
-
-	// Make sure project dir is absolute
-	projectDir, err := fp.Abs(projectDir)
+	// Get project directory in workdir
+	projectDir, err := os.Getwd()
 	if err != nil {
-		cRedBold.Println("Failed to get project dir:", err)
+		cRedBold.Println("Failed to get current working dir:", err)
 		os.Exit(1)
 	}
 
