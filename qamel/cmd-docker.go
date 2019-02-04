@@ -82,7 +82,7 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 	dockerWorkdir := unixJoinPath(dockerGopath, projectDir)
 	dockerBindSrc := unixJoinPath(hostGopath, "src")
 	dockerBindDst := unixJoinPath(dockerGopath, "src")
-	dockerBindFs := fmt.Sprintf(`type=bind,src="%s",dst="%s"`, dockerBindSrc, dockerBindDst)
+	dockerBindFs := fmt.Sprintf(`type=bind,src=%s,dst=%s`, dockerBindSrc, dockerBindDst)
 	dockerImageName := fmt.Sprintf("radhifadlillah/qamel:%s", target)
 
 	dockerArgs := []string{"run", "--rm",
