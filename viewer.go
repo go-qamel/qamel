@@ -6,7 +6,18 @@ package qamel
 // #include <stdbool.h>
 // #include "viewer.h"
 import "C"
-import "unsafe"
+import (
+	"fmt"
+	"os"
+	fp "path/filepath"
+	"strings"
+	"sync"
+	"time"
+	"unsafe"
+
+	"github.com/fsnotify/fsnotify"
+	"github.com/sirupsen/logrus"
+)
 
 // Viewer is the QML viewer which wraps QQuickView
 type Viewer struct {
@@ -263,4 +274,76 @@ func (view Viewer) Reload() {
 	}
 
 	C.Viewer_Reload(view.ptr)
+}
+
+// WatchResourceDir watches for change inside the specified resource dir.
+// When change happened, the view will be reloaded immediately.
+func (view Viewer) WatchResourceDir(dirPath string) {
+	// Make sure directory is exists
+	dirInfo, err := os.Stat(dirPath)
+	if os.IsNotExist(err) || !dirInfo.IsDir() {
+		logrus.Fatalf("directory %s does not exist\n", dirPath)
+	}
+
+	// Create watcher
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		logrus.Fatalln("failed to create watcher:", err)
+	}
+	defer watcher.Close()
+
+	// Add all subdir inside resource dir to watcher
+	err = fp.Walk(dirPath, func(path string, info os.FileInfo, _ error) error {
+		if info.IsDir() {
+			return watcher.Add(path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		logrus.Fatalln("failed to scan resource dir:", err)
+	}
+
+	// Watch for files change
+	mutex := sync.Mutex{}
+	lastEvent := struct {
+		Name string
+		Time time.Time
+	}{}
+
+	for {
+		select {
+		case event := <-watcher.Events:
+			// Make sure the file is not qmlc or jsc
+			fileName := event.Name
+			if fp.Ext(fileName) == ".qmlc" || strings.Contains(fileName, ".qmlc.") ||
+				fp.Ext(fileName) == ".jsc" || strings.Contains(fileName, ".jsc.") {
+				continue
+			}
+
+			// In some OS, the write events fired twice.
+			// To fix this, check if current event is happened less than one sec before.
+			// If yes, skip this event.
+			now := time.Now()
+			eventName := fmt.Sprintf("%s: %s", event.Op.String(), fileName)
+			if lastEvent.Name == eventName && now.Sub(lastEvent.Time).Seconds() <= 1.0 {
+				continue
+			}
+
+			// Else, save this event and reload view.
+			mutex.Lock()
+			lastEvent = struct {
+				Name string
+				Time time.Time
+			}{Name: eventName, Time: now}
+			mutex.Unlock()
+
+			logrus.Println(eventName)
+			view.Reload()
+		case err := <-watcher.Errors:
+			if err != nil {
+				logrus.Errorln("Watcher error:", err)
+			}
+		}
+	}
 }
