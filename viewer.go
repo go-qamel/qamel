@@ -278,11 +278,18 @@ func (view Viewer) Reload() {
 
 // WatchResourceDir watches for change inside the specified resource dir.
 // When change happened, the view will be reloaded immediately.
+// The directory path must be absolute.
+// Only use this in development environment.
 func (view Viewer) WatchResourceDir(dirPath string) {
 	// Make sure directory is exists
 	dirInfo, err := os.Stat(dirPath)
 	if os.IsNotExist(err) || !dirInfo.IsDir() {
 		logrus.Fatalf("directory %s does not exist\n", dirPath)
+	}
+
+	// Make sure directory path is absolute
+	if !fp.IsAbs(dirPath) {
+		logrus.Fatalln("path to directory must be absolute")
 	}
 
 	// Create watcher
@@ -305,6 +312,9 @@ func (view Viewer) WatchResourceDir(dirPath string) {
 	}
 
 	// Watch for files change
+	logrus.Infoln("File watcher enabled for ", dirPath)
+	logrus.Infoln("Only use it in safe environment")
+
 	mutex := sync.Mutex{}
 	lastEvent := struct {
 		Name string
@@ -327,6 +337,11 @@ func (view Viewer) WatchResourceDir(dirPath string) {
 			now := time.Now()
 			eventName := fmt.Sprintf("%s: %s", event.Op.String(), fileName)
 			if lastEvent.Name == eventName && now.Sub(lastEvent.Time).Seconds() <= 1.0 {
+				continue
+			}
+
+			// Also make sure that file is not empty
+			if info, err := os.Stat(fileName); err != nil || info.Size() == 0 {
 				continue
 			}
 
