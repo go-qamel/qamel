@@ -136,13 +136,14 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 	cGreen.Println("done")
 
+	// Prepare default output path
+	if outputPath == "" {
+		outputPath = fp.Join(projectDir, fp.Base(projectDir))
+	}
+
 	// Run go build
 	fmt.Print("Building app...")
-	cmdArgs := []string{"build"}
-
-	if outputPath != "" {
-		cmdArgs = append(cmdArgs, "-o", outputPath)
-	}
+	cmdArgs := []string{"build", "-o", outputPath}
 
 	if len(buildTags) > 0 {
 		cmdArgs = append(cmdArgs, "-tags")

@@ -3,6 +3,7 @@ package generator
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	fp "path/filepath"
@@ -81,7 +82,7 @@ func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 		cmdLdd := exec.Command("ldd", fileName)
 		lddResult, err := cmdLdd.CombinedOutput()
 		if err != nil {
-			continue
+			return fmt.Errorf("%v: %s", err, lddResult)
 		}
 
 		// Parse ldd results

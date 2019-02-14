@@ -3,6 +3,7 @@ package generator
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	fp "path/filepath"
@@ -101,7 +102,7 @@ func copyWindowsLibs(qmakeVars map[string]string, profile config.Profile, output
 		cmdObjdump := exec.Command(profile.Objdump, "-p", fileName)
 		objdumpResult, err := cmdObjdump.CombinedOutput()
 		if err != nil {
-			continue
+			return fmt.Errorf("%v: %s", err, objdumpResult)
 		}
 
 		// Parse objdump results
