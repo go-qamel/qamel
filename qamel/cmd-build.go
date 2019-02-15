@@ -139,6 +139,9 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Prepare default output path
 	if outputPath == "" {
 		outputPath = fp.Join(projectDir, fp.Base(projectDir))
+		if profile.OS == "windows" {
+			outputPath += ".exe"
+		}
 	}
 
 	// Run go build
@@ -229,3 +232,4 @@ func removeQamelFiles(rootDir string) error {
 
 	return err
 }
+
