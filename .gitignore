@@ -9,6 +9,7 @@ qamel-*.go
 qamel-*.cpp
 qamel/qamel*
 *_plugin_import.cpp
+qamel.makefile.Release
 
 # Exclude sample executable
 example/hello-world*
