@@ -6,7 +6,7 @@ void SetQuickStyle(char* style) {
     QQuickStyle::setStyle(QString(style));
 }
 
-void SetQuickFallbackStyle(char* style) {
+void SetQuickStyleFallback(char* style) {
     QQuickStyle::setFallbackStyle(QString(style));
 }
 

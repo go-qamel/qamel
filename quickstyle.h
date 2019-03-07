@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 void SetQuickStyle(char* style);
-void SetQuickFallbackStyle(char* style);
+void SetQuickStyleFallback(char* style);
 void AddQuickStylePath(char* style);
 
 #ifdef __cplusplus
