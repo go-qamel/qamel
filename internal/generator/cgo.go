@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/qamel/config"
+	"github.com/RadhiFadlillah/qamel/internal/config"
 )
 
 var (

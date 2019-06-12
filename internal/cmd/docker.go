@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -13,19 +13,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cmdDocker = &cobra.Command{
-	Use:   "docker [target]",
-	Run:   dockerHandler,
-	Args:  cobra.ExactArgs(1),
-	Short: "Build QML app using Docker image",
-	Long: "Build QML app using Docker image.\nPossible values are " +
-		`"linux", "linux-static", "win32", "win32-static", "win64" and "win64-static".`,
-}
+func dockerCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "docker [target]",
+		Run:   dockerHandler,
+		Args:  cobra.ExactArgs(1),
+		Short: "Build QML app using Docker image",
+		Long: "Build QML app using Docker image.\nPossible values are " +
+			`"linux", "linux-static", "win32", "win32-static", "win64" and "win64-static".`,
+	}
 
-func init() {
-	cmdDocker.Flags().StringP("output", "o", "", "location for executable file")
-	cmdDocker.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
-	cmdDocker.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
+	cmd.Flags().StringP("output", "o", "", "location for executable file")
+	cmd.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
+	cmd.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
+
+	return cmd
 }
 
 func dockerHandler(cmd *cobra.Command, args []string) {

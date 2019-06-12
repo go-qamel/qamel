@@ -8,7 +8,7 @@ import (
 	fp "path/filepath"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/qamel/config"
+	"github.com/RadhiFadlillah/qamel/internal/config"
 )
 
 // CopyDependencies copies dependecies files to output directory

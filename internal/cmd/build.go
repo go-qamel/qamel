@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -7,23 +7,25 @@ import (
 	fp "path/filepath"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/qamel/config"
-	"github.com/RadhiFadlillah/qamel/qamel/generator"
+	"github.com/RadhiFadlillah/qamel/internal/config"
+	"github.com/RadhiFadlillah/qamel/internal/generator"
 	"github.com/spf13/cobra"
 )
 
-var cmdBuild = &cobra.Command{
-	Use:   "build",
-	Short: "Build QML app",
-	Args:  cobra.NoArgs,
-	Run:   buildHandler,
-}
+func buildCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "build",
+		Short: "Build QML app",
+		Args:  cobra.NoArgs,
+		Run:   buildHandler,
+	}
 
-func init() {
-	cmdBuild.Flags().StringP("output", "o", "", "location for executable file")
-	cmdBuild.Flags().StringP("profile", "p", "", "profile that used for building app")
-	cmdBuild.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
-	cmdBuild.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
+	cmd.Flags().StringP("output", "o", "", "location for executable file")
+	cmd.Flags().StringP("profile", "p", "", "profile that used for building app")
+	cmd.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
+	cmd.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
+
+	return cmd
 }
 
 func buildHandler(cmd *cobra.Command, args []string) {
@@ -232,4 +234,3 @@ func removeQamelFiles(rootDir string) error {
 
 	return err
 }
-

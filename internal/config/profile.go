@@ -22,7 +22,7 @@ type Profile struct {
 	Objdump string
 }
 
-// LoadProfiles load all profiles inside config file in ${XDG_CONFIG_HOME}/qamel/config
+// LoadProfiles load all profiles inside config file in the specified configPath.
 func LoadProfiles(configPath string) (map[string]Profile, error) {
 	// If config file doesn't exist, return empty map
 	if !fileExists(configPath) {
@@ -42,7 +42,7 @@ func LoadProfiles(configPath string) (map[string]Profile, error) {
 	return profiles, err
 }
 
-// LoadProfile loads profile with specified name from config file
+// LoadProfile loads profile with specified name from config file.
 func LoadProfile(configPath string, name string) (Profile, error) {
 	profiles, err := LoadProfiles(configPath)
 	if err != nil {
@@ -56,7 +56,7 @@ func LoadProfile(configPath string, name string) (Profile, error) {
 	return Profile{}, fmt.Errorf("profile %s doesn't exist", name)
 }
 
-// SaveProfiles saves the profile as JSON in ${XDG_CONFIG_HOME}/qamel/config
+// SaveProfiles saves the profile as JSON in the specified configPath.
 func SaveProfiles(configPath string, profiles map[string]Profile) error {
 	// Make sure config dir is exists
 	os.MkdirAll(fp.Dir(configPath), os.ModePerm)
