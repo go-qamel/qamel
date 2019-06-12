@@ -1,28 +1,17 @@
 package cmd
 
 import (
-	"go/build"
 	"log"
-	"os"
-	fp "path/filepath"
 
 	ap "github.com/muesli/go-app-paths"
 	"github.com/spf13/cobra"
 )
 
 var (
-	qamelDir   = fp.Join("github.com", "RadhiFadlillah", "qamel")
 	configPath = "config.json"
 )
 
 func init() {
-	// Get qamel directory
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		gopath = build.Default.GOPATH
-	}
-	qamelDir = fp.Join(gopath, "src", qamelDir)
-
 	// Get config path in ${XDG_CONFIG_HOME}/qamel/config.json
 	var err error
 	userScope := ap.NewScope(ap.User, "qamel", "qamel")

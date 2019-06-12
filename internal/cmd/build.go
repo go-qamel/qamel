@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"go/build"
 	"os"
 	"os/exec"
 	fp "path/filepath"
@@ -38,13 +39,6 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	profileName, _ := cmd.Flags().GetString("profile")
 	copyDependencies, _ := cmd.Flags().GetBool("copy-deps")
 
-	// Get project directory in workdir
-	projectDir, err := os.Getwd()
-	if err != nil {
-		cRedBold.Println("Failed to get current working dir:", err)
-		os.Exit(1)
-	}
-
 	// Load config file
 	fmt.Print("Load config file...")
 
@@ -61,6 +55,61 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 	cGreen.Println("done")
+
+	// Get project directory in workdir
+	projectDir, err := os.Getwd()
+	if err != nil {
+		cRedBold.Println("Failed to get current working dir:", err)
+		os.Exit(1)
+	}
+
+	// If this project uses Go module, make sure to use vendor.
+	// This is because `qamel build` works by generating binding code
+	// in project dir and Qamel dir as well. This is done every time
+	// user build his app, because every user might have different
+	// profile and config on each build. In old times, the Qamel dir
+	// in $GOPATH/src is easily accessible and modified. However,
+	// in current Go module, the Qamel dir in $GOPATH/pkg/mod is read
+	// only, which make it impossible to generate binding code there.
+	// Therefore, as workaround, Qamel in Go module *MUST* be used in
+	// vendor by using `go mod vendor`.
+	goModFile := fp.Join(projectDir, "go.mod")
+	usesGoModule := fileExists(goModFile)
+
+	if usesGoModule {
+		fmt.Print("Generating vendor files...")
+
+		cmdModVendor := exec.Command("go", "mod", "vendor")
+		cmdOutput, err := cmdModVendor.CombinedOutput()
+		if err != nil {
+			fmt.Println()
+			cRedBold.Println("Failed to vendor app:", err)
+			cRedBold.Println(string(cmdOutput))
+			os.Exit(1)
+		}
+
+		cGreen.Println("done")
+	}
+
+	// Get Qamel directory, depending on whether vendoring is used
+	qamelDir := fp.Join("github.com", "RadhiFadlillah", "qamel")
+	vendorDir := fp.Join(projectDir, "vendor", qamelDir)
+
+	if dirExists(vendorDir) {
+		qamelDir = vendorDir
+	} else {
+		gopath := os.Getenv("GOPATH")
+		if gopath == "" {
+			gopath = build.Default.GOPATH
+		}
+		qamelDir = fp.Join(gopath, "src", qamelDir)
+	}
+
+	// Make sure the Qamel directory exists
+	if !dirExists(qamelDir) {
+		cRedBold.Println("Failed to access qamel: source directory doesn't exist")
+		os.Exit(1)
+	}
 
 	// Remove old qamel files
 	fmt.Print("Removing old build files...")
@@ -149,6 +198,10 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// Run go build
 	fmt.Print("Building app...")
 	cmdArgs := []string{"build", "-o", outputPath}
+
+	if usesGoModule {
+		cmdArgs = append(cmdArgs, "-mod", "vendor")
+	}
 
 	if len(buildTags) > 0 {
 		cmdArgs = append(cmdArgs, "-tags")
