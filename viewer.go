@@ -11,7 +11,6 @@ import (
 	"os"
 	fp "path/filepath"
 	"strings"
-	"sync"
 	"time"
 	"unsafe"
 
@@ -315,7 +314,6 @@ func (view Viewer) WatchResourceDir(dirPath string) {
 	logrus.Infoln("File watcher enabled for ", dirPath)
 	logrus.Infoln("Only use it in safe environment")
 
-	mutex := sync.Mutex{}
 	lastEvent := struct {
 		Name string
 		Time time.Time
@@ -346,12 +344,10 @@ func (view Viewer) WatchResourceDir(dirPath string) {
 			}
 
 			// Else, save this event and reload view.
-			mutex.Lock()
 			lastEvent = struct {
 				Name string
 				Time time.Time
 			}{Name: eventName, Time: now}
-			mutex.Unlock()
 
 			logrus.Println(eventName)
 			view.Reload()
