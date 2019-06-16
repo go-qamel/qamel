@@ -3,3 +3,4 @@
 
 # Exclude generated file
 /qamel
+/moc-*.h

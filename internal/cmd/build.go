@@ -123,16 +123,21 @@ func buildHandler(cmd *cobra.Command, args []string) {
 
 	os.Remove(fp.Join(projectDir, "qamel-icon.syso"))
 	os.Remove(fp.Join(qamelDir, "moc-viewer.h"))
+	os.Remove(fp.Join(qamelDir, "moc-tablemodel.h"))
 	os.Remove(fp.Join(qamelDir, "qamel_plugin_import.cpp"))
 	os.Remove(fp.Join(qamelDir, "qamel_qml_plugin_import.cpp"))
 
 	// Generate cgo file and moc for binding in qamel directory
 	fmt.Print("Generating binding files...")
-	err = generator.CreateMocFile(profile.Moc, fp.Join(qamelDir, "viewer.cpp"))
-	if err != nil {
-		fmt.Println()
-		cRedBold.Println("Failed to create moc file for viewer:", err)
-		os.Exit(1)
+	filesToMoc := []string{"viewer.cpp", "tablemodel.h"}
+
+	for _, fileToMoc := range filesToMoc {
+		err = generator.CreateMocFile(profile.Moc, fp.Join(qamelDir, fileToMoc))
+		if err != nil {
+			fmt.Println()
+			cRedBold.Printf("Failed to create moc file for %s: %v\n", fileToMoc, err)
+			os.Exit(1)
+		}
 	}
 
 	err = generator.CreateCgoFile(profile, qamelDir, "")
