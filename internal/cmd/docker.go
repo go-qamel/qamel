@@ -49,6 +49,12 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	// Get gopath
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+
 	// Get project directory from current working dir
 	projectDir, err := os.Getwd()
 	if err != nil {
@@ -61,14 +67,6 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 	err = os.MkdirAll(cacheDir, os.ModePerm)
 	if err != nil {
 		cRedBold.Println("Failed to create cache directory:", err)
-		os.Exit(1)
-	}
-
-	// Get relative path for project dir from $GOPATH
-	gopath := build.Default.GOPATH
-	projectDir, err = fp.Rel(gopath, projectDir)
-	if err != nil {
-		cRedBold.Println("Failed to get relative path of project dir:", err)
 		os.Exit(1)
 	}
 
@@ -90,7 +88,10 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 
 	// Prepare docker arguments
 	dockerGopath := unixJoinPath("/", "home", "user", "go")
-	dockerProjectDir := unixJoinPath(dockerGopath, projectDir)
+	dockerProjectDir := unixJoinPath(dockerGopath, "src", fp.Base(projectDir))
+
+	dockerBindProject := fmt.Sprintf(`type=bind,src=%s,dst=%s`,
+		projectDir, dockerProjectDir)
 	dockerBindGoSrc := fmt.Sprintf(`type=bind,src=%s,dst=%s`,
 		unixJoinPath(gopath, "src"),
 		unixJoinPath(dockerGopath, "src"))
@@ -98,15 +99,25 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 		unixJoinPath(cacheDir),
 		unixJoinPath("/", "home", "user", ".cache", "go-build"))
 
-	dockerImageName := fmt.Sprintf("radhifadlillah/qamel:%s", target)
 	dockerArgs := []string{"run", "--rm",
 		"--attach", "stdout",
 		"--attach", "stderr",
 		"--user", dockerUser,
 		"--workdir", dockerProjectDir,
+		"--mount", dockerBindProject,
 		"--mount", dockerBindGoSrc,
-		"--mount", dockerBindGoCache,
-		dockerImageName}
+		"--mount", dockerBindGoCache}
+
+	goModFile := fp.Join(projectDir, "go.mod")
+	if fileExists(goModFile) {
+		dockerArgs = append(dockerArgs, "--env", "GO111MODULE=on")
+	}
+
+	dockerImageName := fmt.Sprintf("radhifadlillah/qamel:%s", target)
+	dockerArgs = append(dockerArgs, dockerImageName)
+
+	// Add qamel arguments
+	dockerArgs = append(dockerArgs, "--skip-vendoring")
 
 	if outputPath != "" {
 		dockerArgs = append(dockerArgs, "-o", outputPath)

@@ -25,6 +25,7 @@ func buildCmd() *cobra.Command {
 	cmd.Flags().StringP("profile", "p", "", "profile that used for building app")
 	cmd.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
 	cmd.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
+	cmd.Flags().Bool("skip-vendoring", false, "if uses Go module, skip updating project's vendor")
 
 	return cmd
 }
@@ -38,6 +39,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	outputPath, _ := cmd.Flags().GetString("output")
 	profileName, _ := cmd.Flags().GetString("profile")
 	copyDependencies, _ := cmd.Flags().GetBool("copy-deps")
+	skipVendoring, _ := cmd.Flags().GetBool("skip-vendoring")
 
 	// Load config file
 	fmt.Print("Load config file...")
@@ -73,10 +75,11 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	// only, which make it impossible to generate binding code there.
 	// Therefore, as workaround, Qamel in Go module *MUST* be used in
 	// vendor by using `go mod vendor`.
+	vendorDir := fp.Join(projectDir, "vendor", "github.com", "RadhiFadlillah", "qamel")
 	goModFile := fp.Join(projectDir, "go.mod")
 	usesGoModule := fileExists(goModFile)
 
-	if usesGoModule {
+	if usesGoModule && (!dirExists(vendorDir) || !skipVendoring) {
 		fmt.Print("Generating vendor files...")
 
 		cmdModVendor := exec.Command("go", "mod", "vendor")
@@ -91,13 +94,9 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		cGreen.Println("done")
 	}
 
-	// Get Qamel directory, depending on whether vendoring is used
-	qamelDir := fp.Join("github.com", "RadhiFadlillah", "qamel")
-	vendorDir := fp.Join(projectDir, "vendor", qamelDir)
-
-	if dirExists(vendorDir) {
-		qamelDir = vendorDir
-	} else {
+	// If vendor doesn't exist, uses Qamel dir in GOPATH
+	qamelDir := vendorDir
+	if !dirExists(qamelDir) {
 		gopath := os.Getenv("GOPATH")
 		if gopath == "" {
 			gopath = build.Default.GOPATH
