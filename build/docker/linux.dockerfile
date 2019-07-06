@@ -1,10 +1,10 @@
-FROM ubuntu:16.04 as base
+FROM ubuntu:18.04 as base
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
-ENV GO_VERSION 1.11.5
-ENV QT_MAJOR 5.12
-ENV QT_VERSION 5.12.0
+ENV GO_VERSION 1.12.6
+ENV QT_MAJOR 5.13
+ENV QT_VERSION 5.13.0
 
 # Install Go
 RUN apt-get -qq update && \
@@ -13,7 +13,7 @@ RUN curl -SL --retry 10 --retry-delay 60 https://dl.google.com/go/go$GO_VERSION.
     tar -xzC /usr/local
 
 # Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/qamel
+RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel
 
 # Install Qt5
 RUN apt-get -qq update && \
@@ -22,7 +22,7 @@ RUN curl -SL --retry 10 --retry-delay 60 -O https://download.qt.io/official_rele
 
 RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
     ./qt-opensource-linux-x64-$QT_VERSION.run -v \
-        --script $GOPATH/src/github.com/RadhiFadlillah/qamel/docker/installer-script.qs \
+        --script $GOPATH/src/github.com/RadhiFadlillah/qamel/build/docker/installer-script.qs \
         --platform minimal
 
 # Clean up after installing Qt5
@@ -32,11 +32,11 @@ RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
 
 # ========== END OF BASE ========== #
 
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
-ENV QT_VERSION 5.12.0
+ENV QT_VERSION 5.13.0
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Copy Go and Qamel from base
@@ -58,9 +58,9 @@ RUN printf '%s %s %s %s %s %s %s %s %s %s\n' \
     '"OS":"linux",' \
     '"Arch":"amd64",' \
     '"Static":false,' \
-    '"Qmake":"/opt/Qt5.12.0/5.12.0/gcc_64/bin/qmake",' \
-    '"Moc":"/opt/Qt5.12.0/5.12.0/gcc_64/bin/moc",' \
-    '"Rcc":"/opt/Qt5.12.0/5.12.0/gcc_64/bin/rcc",' \
+    '"Qmake":"/opt/Qt5.13.0/5.13.0/gcc_64/bin/qmake",' \
+    '"Moc":"/opt/Qt5.13.0/5.13.0/gcc_64/bin/moc",' \
+    '"Rcc":"/opt/Qt5.13.0/5.13.0/gcc_64/bin/rcc",' \
     '"Gcc":"gcc",' \
     '"Gxx":"g++"' \
     '}}' > $HOME/.config/qamel/config.json

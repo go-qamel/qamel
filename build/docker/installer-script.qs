@@ -20,7 +20,7 @@ Controller.prototype.TargetDirectoryPageCallback = function() {
 }
 
 Controller.prototype.ComponentSelectionPageCallback = function() {
-	var qtVersion = 'qt5.5120',
+	var qtVersion = 'qt5.5130',
 		widget = gui.currentPageWidget();
 	
 	widget.deselectAll();

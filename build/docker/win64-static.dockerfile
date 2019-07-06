@@ -2,19 +2,19 @@ FROM radhifadlillah/qamel:linux as linux
 
 # ========== END OF LINUX ========== #
 
-FROM ubuntu:16.04 as base
+FROM ubuntu:18.04 as base
 
 RUN apt-get -qq update && \
     apt-get -qq -y install software-properties-common apt-transport-https
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 86B72ED9
-RUN add-apt-repository 'deb [arch=amd64] https://mirror.mxe.cc/repos/apt xenial main'
+RUN add-apt-repository 'deb [arch=amd64] https://pkg.mxe.cc/repos/apt bionic main'
 RUN apt-get -qq update && \
     apt-get -qq -y install mxe-x86-64-w64-mingw32.static-qt5
 
 # ========== END OF BASE ========== #
 
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go

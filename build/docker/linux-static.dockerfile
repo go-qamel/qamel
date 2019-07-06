@@ -2,15 +2,24 @@ FROM radhifadlillah/qamel:linux as linux
 
 # ========== END OF LINUX ========== #
 
-FROM ubuntu:16.04 as base
+FROM ubuntu:18.04 as base
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
-    apt-get -qq -y install curl build-essential libgl1-mesa-dev libfontconfig1-dev libglib2.0-dev libglu1-mesa-dev libxrender1 libdbus-1-dev libx11-dev libx11-xcb-dev
+    apt-get -qq -y install curl build-essential python \
+    libglib2.0-dev libglu1-mesa-dev libpulse-dev fontconfig \
+    libasound2 libegl1-mesa libnss3 libpci3 libxcomposite1 \
+    libxcursor1 libxi6 libxrandr2 libxtst6 libdbus-1-dev libssl-dev \
+    libxkbcommon-dev libfontconfig1-dev libfreetype6-dev libx11-dev \
+    libxext-dev libxfixes-dev libxi-dev libxrender-dev libxcb1-dev \
+    libx11-xcb-dev libxcb-glx0-dev libxcb-keysyms1-dev \
+    libxcb-image0-dev libxcb-shm0-dev libxcb-icccm4-dev \
+    libxcb-sync0-dev libxcb-xfixes0-dev libxcb-shape0-dev \
+    libxcb-randr0-dev libxcb-render-util0-dev
 
 # Download source of Qt5
-ENV QT_MAJOR 5.12
-ENV QT_VERSION 5.12.0
+ENV QT_MAJOR 5.13
+ENV QT_VERSION 5.13.0
 RUN curl -SL --retry 10 --retry-delay 60 https://download.qt.io/official_releases/qt/$QT_MAJOR/$QT_VERSION/single/qt-everywhere-src-$QT_VERSION.tar.xz | \
     tar -xJC /
 
@@ -18,20 +27,21 @@ RUN curl -SL --retry 10 --retry-delay 60 https://download.qt.io/official_release
 RUN cd qt-everywhere-src-$QT_VERSION && \
     ./configure -prefix "/opt/Qt$QT_VERSION" \
         -confirm-license -opensource -static \
-        -release -optimize-size -qt-doubleconversion \
-        -no-icu -qt-pcre -qt-zlib -qt-freetype \
-        -qt-harfbuzz -qt-xcb -qt-libpng -qt-libjpeg \
-        -make libs -nomake tools -nomake examples -nomake tests \
-        -skip qtwebengine && \
-    make && make install
+        -qt-zlib -qt-libpng -qt-libjpeg -qt-xcb \
+        -sysconfdir /etc/xdg -dbus-runtime -openssl-runtime \
+        -opengl -optimize-size -skip qtwebengine -skip qtfeedback \
+        -skip qtpim -skip qtdocgallery -skip qtwebengine \
+        -nomake tests -nomake examples && \
+    make -j $(grep -c ^processor /proc/cpuinfo) && \
+    make install -j $(grep -c ^processor /proc/cpuinfo)
 
 # ========== END OF BASE ========== #
 
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
-ENV QT_VERSION 5.12.0
+ENV QT_VERSION 5.13.0
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Copy Go and Qamel from linux
@@ -44,7 +54,11 @@ COPY --from=base /opt/Qt$QT_VERSION /opt/Qt$QT_VERSION
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
-    apt-get -qq -y install build-essential libgl1-mesa-dev libfontconfig1-dev libglib2.0-dev libglu1-mesa-dev libxrender1 libdbus-1-dev
+    apt-get -qq -y install build-essential libglib2.0-dev libglu1-mesa-dev libpulse-dev \
+        fontconfig libasound2 libegl1-mesa libnss3 libpci3 libxcomposite1 libxcursor1 \
+        libxi6 libxrandr2 libxtst6 libfontconfig1-dev libfreetype6-dev libxrender-dev \
+        libxkbcommon-dev && \
+    apt-get -qq clean
 
 # Create profile for Qamel
 RUN mkdir -p $HOME/.config/qamel
@@ -53,9 +67,9 @@ RUN printf '%s %s %s %s %s %s %s %s %s %s\n' \
     '"OS":"linux",' \
     '"Arch":"amd64",' \
     '"Static":true,' \
-    '"Qmake":"/opt/Qt5.12.0/bin/qmake",' \
-    '"Moc":"/opt/Qt5.12.0/bin/moc",' \
-    '"Rcc":"/opt/Qt5.12.0/bin/rcc",' \
+    '"Qmake":"/opt/Qt5.13.0/bin/qmake",' \
+    '"Moc":"/opt/Qt5.13.0/bin/moc",' \
+    '"Rcc":"/opt/Qt5.13.0/bin/rcc",' \
     '"Gcc":"gcc",' \
     '"Gxx":"g++"' \
     '}}' > $HOME/.config/qamel/config.json
