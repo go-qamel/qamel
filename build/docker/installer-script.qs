@@ -16,6 +16,7 @@ Controller.prototype.IntroductionPageCallback = function() {
 }
 
 Controller.prototype.TargetDirectoryPageCallback = function() {
+	gui.currentPageWidget().TargetDirectoryLineEdit.setText("/home/user/Qt5.13.0");
 	gui.clickButton(buttons.NextButton);
 }
 
