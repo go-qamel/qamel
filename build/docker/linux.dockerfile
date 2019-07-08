@@ -18,7 +18,8 @@ RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel
 # Install Qt5
 RUN apt-get -qq update && \
     apt-get -qq -y install dbus libfontconfig1 libx11-6 libx11-xcb1
-RUN curl -SL --retry 10 --retry-delay 60 -O https://download.qt.io/official_releases/qt/$QT_MAJOR/$QT_VERSION/qt-opensource-linux-x64-$QT_VERSION.run
+RUN curl -SL --retry 10 --retry-delay 60 -O \
+    https://download.qt.io/official_releases/qt/$QT_MAJOR/$QT_VERSION/qt-opensource-linux-x64-$QT_VERSION.run
 
 RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
     ./qt-opensource-linux-x64-$QT_VERSION.run -v \
@@ -27,8 +28,8 @@ RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
 
 # Clean up after installing Qt5
 RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
-           /opt/Qt$QT_VERSION/Examples \
-           /opt/Qt$QT_VERSION/Tools
+            /opt/Qt$QT_VERSION/Examples \
+            /opt/Qt$QT_VERSION/Tools
 
 # ========== END OF BASE ========== #
 
@@ -49,7 +50,10 @@ COPY --from=base /opt/Qt$QT_VERSION /opt/Qt$QT_VERSION
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
-    apt-get -qq -y install build-essential libgl1-mesa-dev libfontconfig1-dev libglib2.0-dev libglu1-mesa-dev libxrender1 libdbus-1-dev
+    apt-get -qq -y install \
+        build-essential libgl1-mesa-dev libfontconfig1-dev libglib2.0-dev \
+        libglu1-mesa-dev libxrender1 libdbus-1-dev libpulse-dev && \
+    apt-get -qq clean
 
 # Create profile for Qamel
 RUN mkdir -p $HOME/.config/qamel
