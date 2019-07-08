@@ -49,28 +49,7 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	// Get gopath
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		gopath = build.Default.GOPATH
-	}
-
-	// Get project directory from current working dir
-	projectDir, err := os.Getwd()
-	if err != nil {
-		cRedBold.Println("Failed to get current working dir:", err)
-		os.Exit(1)
-	}
-
-	// Create directory for build's cache
-	cacheDir := fp.Join(projectDir, ".qamel-cache", target)
-	err = os.MkdirAll(cacheDir, os.ModePerm)
-	if err != nil {
-		cRedBold.Println("Failed to create cache directory:", err)
-		os.Exit(1)
-	}
-
-	// Create docker user
+	// Get docker user from current active user
 	currentUser, err := user.Current()
 	if err != nil {
 		cRedBold.Println("Failed to get user's data:", err)
@@ -86,9 +65,44 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 		dockerUser = uidParts[len(uidParts)-1]
 	}
 
+	// Get gopath
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+
+	// Get project directory from current working dir
+	projectDir, err := os.Getwd()
+	if err != nil {
+		cRedBold.Println("Failed to get current working dir:", err)
+		os.Exit(1)
+	}
+
+	// Create directory for Go build's cache
+	goCacheDir := fp.Join(projectDir, ".qamel-cache", target, "go")
+
+	err = os.MkdirAll(goCacheDir, os.ModePerm)
+	if err != nil {
+		cRedBold.Println("Failed to create cache directory for Go build:", err)
+		os.Exit(1)
+	}
+
+	// If target is Linux, create ccache dir as well
+	ccacheDir := ""
+	if strings.HasPrefix(target, "linux") {
+		ccacheDir = fp.Join(projectDir, ".qamel-cache", target, "ccache")
+
+		err = os.MkdirAll(ccacheDir, os.ModePerm)
+		if err != nil {
+			cRedBold.Println("Failed to create cache directory for gcc build:", err)
+			os.Exit(1)
+		}
+	}
+
 	// Prepare docker arguments
 	dockerGopath := unixJoinPath("/", "home", "user", "go")
 	dockerProjectDir := unixJoinPath(dockerGopath, "src", fp.Base(projectDir))
+	dockerGoCacheDir := unixJoinPath("/", "home", "user", ".cache", "go-build")
 
 	dockerBindProject := fmt.Sprintf(`type=bind,src=%s,dst=%s`,
 		projectDir, dockerProjectDir)
@@ -96,8 +110,7 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 		unixJoinPath(gopath, "src"),
 		unixJoinPath(dockerGopath, "src"))
 	dockerBindGoCache := fmt.Sprintf(`type=bind,src=%s,dst=%s`,
-		unixJoinPath(cacheDir),
-		unixJoinPath("/", "home", "user", ".cache", "go-build"))
+		unixJoinPath(goCacheDir), dockerGoCacheDir)
 
 	dockerArgs := []string{"run", "--rm",
 		"--attach", "stdout",
@@ -108,11 +121,21 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 		"--mount", dockerBindGoSrc,
 		"--mount", dockerBindGoCache}
 
+	if ccacheDir != "" {
+		dockerCcacheDir := unixJoinPath("/", "home", "user", ".ccache")
+		dockerBindCcache := fmt.Sprintf(`type=bind,src=%s,dst=%s`,
+			unixJoinPath(ccacheDir), dockerCcacheDir)
+
+		dockerArgs = append(dockerArgs, "--mount", dockerBindCcache)
+	}
+
+	// If uses go module, set env GO111MODULE to on
 	goModFile := fp.Join(projectDir, "go.mod")
 	if fileExists(goModFile) {
 		dockerArgs = append(dockerArgs, "--env", "GO111MODULE=on")
 	}
 
+	// Finally, set image name
 	dockerImageName := fmt.Sprintf("radhifadlillah/qamel:%s", target)
 	dockerArgs = append(dockerArgs, dockerImageName)
 

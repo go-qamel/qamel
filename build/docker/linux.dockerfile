@@ -55,6 +55,12 @@ RUN apt-get -qq update && \
         libglu1-mesa-dev libxrender1 libdbus-1-dev libpulse-dev && \
     apt-get -qq clean
 
+# Install ccache for faster build
+RUN apt-get -qq update && \
+    apt-get -qq -y install ccache && \
+    apt-get -qq clean
+ENV PATH "/usr/lib/ccache:$PATH"
+
 # Create profile for Qamel
 RUN mkdir -p $HOME/.config/qamel
 RUN printf '%s %s %s %s %s %s %s %s %s %s\n' \
