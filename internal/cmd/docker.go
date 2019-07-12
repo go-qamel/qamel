@@ -26,6 +26,7 @@ func dockerCmd() *cobra.Command {
 	cmd.Flags().StringP("output", "o", "", "location for executable file")
 	cmd.Flags().StringSliceP("tags", "t", []string{}, "space-separated list of build tags to satisfied during the build")
 	cmd.Flags().Bool("copy-deps", false, "copy dependencies for app with dynamic linking")
+	cmd.Flags().Bool("skip-vendoring", false, "if uses Go module, skip updating project's vendor")
 
 	return cmd
 }
@@ -37,6 +38,7 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 	buildTags, _ := cmd.Flags().GetStringSlice("tags")
 	outputPath, _ := cmd.Flags().GetString("output")
 	copyDependencies, _ := cmd.Flags().GetBool("copy-deps")
+	skipVendoring, _ := cmd.Flags().GetBool("skip-vendoring")
 
 	// Get target name
 	target := args[0]
@@ -47,6 +49,40 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 	default:
 		cRedBold.Printf("Target %s is not supported.\n", target)
 		os.Exit(1)
+	}
+
+	// Get gopath
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+
+	// Get project directory from current working dir
+	projectDir, err := os.Getwd()
+	if err != nil {
+		cRedBold.Println("Failed to get current working dir:", err)
+		os.Exit(1)
+	}
+
+	// If this project uses Go module, vendor it first before
+	// passing it to Docker
+	vendorDir := fp.Join(projectDir, "vendor", "github.com", "RadhiFadlillah", "qamel")
+	goModFile := fp.Join(projectDir, "go.mod")
+	usesGoModule := fileExists(goModFile)
+
+	if usesGoModule && (!dirExists(vendorDir) || !skipVendoring) {
+		fmt.Print("Generating vendor files...")
+
+		cmdModVendor := exec.Command("go", "mod", "vendor")
+		cmdOutput, err := cmdModVendor.CombinedOutput()
+		if err != nil {
+			fmt.Println()
+			cRedBold.Println("Failed to vendor app:", err)
+			cRedBold.Println(string(cmdOutput))
+			os.Exit(1)
+		}
+
+		cGreen.Println("done")
 	}
 
 	// Get docker user from current active user
@@ -63,19 +99,6 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 	if runtime.GOOS == "windows" {
 		uidParts := strings.Split(uid, "-")
 		dockerUser = uidParts[len(uidParts)-1]
-	}
-
-	// Get gopath
-	gopath := os.Getenv("GOPATH")
-	if gopath == "" {
-		gopath = build.Default.GOPATH
-	}
-
-	// Get project directory from current working dir
-	projectDir, err := os.Getwd()
-	if err != nil {
-		cRedBold.Println("Failed to get current working dir:", err)
-		os.Exit(1)
 	}
 
 	// Create directory for Go build's cache
@@ -130,8 +153,7 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// If uses go module, set env GO111MODULE to on
-	goModFile := fp.Join(projectDir, "go.mod")
-	if fileExists(goModFile) {
+	if usesGoModule {
 		dockerArgs = append(dockerArgs, "--env", "GO111MODULE=on")
 	}
 
