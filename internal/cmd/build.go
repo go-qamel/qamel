@@ -101,7 +101,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 		if gopath == "" {
 			gopath = build.Default.GOPATH
 		}
-		qamelDir = fp.Join(gopath, "src", qamelDir)
+		qamelDir = fp.Join(gopath, "src", "github.com", "RadhiFadlillah", "qamel")
 	}
 
 	// Make sure the Qamel directory exists
