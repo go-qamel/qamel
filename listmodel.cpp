@@ -1,0 +1,169 @@
+#include "_cgo_export.h"
+#include "listmodel.h"
+
+// Overrided method for QAbstractListModel
+int QamelListModel::rowCount(const QModelIndex &) const {
+    return _contents.size();
+}
+
+QVariant QamelListModel::data(const QModelIndex &index, int role) const {
+    if (role != Qt::DisplayRole) {
+        return QVariant();
+    }
+
+    return _contents.at(index.row());
+}
+
+QHash<int, QByteArray> QamelListModel::roleNames() const {
+    QHash<int, QByteArray> role;
+    role[Qt::DisplayRole] = "display";
+    return role;
+}
+
+bool QamelListModel::insertRows(int row, int count, const QModelIndex &parent) {
+    return QAbstractListModel::insertRows(row, count, parent);
+}
+
+bool QamelListModel::removeRows(int row, int count, const QModelIndex &parent) {
+    return QAbstractListModel::removeRows(row, count, parent);
+}
+
+bool QamelListModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild) {
+    return QAbstractListModel::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild);
+}
+
+// Methods for custom QML properties
+QVariantList QamelListModel::contents() const {
+    return _contents;
+}
+
+void QamelListModel::setContents(QVariantList contents) {
+    beginResetModel();
+    _contents = contents;
+    endResetModel();
+
+    emit contentsChanged();
+}
+
+// Methods for custom slots
+QVariant QamelListModel::get(int row) {
+    return _contents.at(row);
+}
+
+int QamelListModel::count() {
+    return _contents.count();
+}
+
+void QamelListModel::clear() {
+    beginResetModel();
+    _contents.clear();
+    endResetModel();
+}
+
+void QamelListModel::insertRow(int row, QVariant obj) {
+    beginInsertRows(QModelIndex(), row, row);
+    _contents.insert(row, obj);
+    endInsertRows();
+
+    emit contentsChanged();
+}
+
+void QamelListModel::insertRows(int row, QVariantList objects) {
+    beginInsertRows(QModelIndex(), row, row+objects.count()-1);
+    for (int i = 0; i < objects.count(); ++i) {
+        _contents.insert(row+i, objects[i]);
+    }
+    endInsertRows();
+
+    emit contentsChanged();
+}
+
+void QamelListModel::appendRow(QVariant obj) {
+    int row = _contents.count();
+
+    beginInsertRows(QModelIndex(), row, row);
+    _contents.insert(row, obj);
+    endInsertRows();
+
+    emit contentsChanged();
+}
+
+void QamelListModel::appendRows(QVariantList objects) {
+    int row = _contents.count();
+    int last = row + objects.count() - 1;
+
+    beginInsertRows(QModelIndex(), row, last);
+    for (int i = 0; i < objects.count(); ++i) {
+        _contents.insert(row+i, objects[i]);
+    }
+    endInsertRows();
+
+    emit contentsChanged();
+}
+
+void QamelListModel::deleteRows(int row, int count) {
+    if (row < 0 || row >= rowCount()) return;
+
+    int last = row+count-1;
+
+    beginRemoveRows(QModelIndex(), row, last);
+    for (int i = last; i >= row; --i) {
+        _contents.removeAt(i);
+    }
+    endRemoveRows();
+
+    emit contentsChanged();
+}
+
+void QamelListModel::setRow(int row, QVariantMap newObj) {
+    if (row < 0 || row >= rowCount()) return;
+
+    _contents[row] = newObj;
+    emit contentsChanged();
+    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+}
+
+void QamelListModel::setRowProperty(int row, QString propName, QVariant newProp) {
+    if (row < 0 || row >= rowCount()) return;
+
+    QVariant obj = _contents.at(row);
+    QVariantMap map = obj.toMap();
+    map[propName] = newProp;
+    _contents[row] = QVariant(map);
+
+    emit contentsChanged();
+    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+}
+
+void QamelListModel::swapRow(int i, int j) {
+    if (i == j) return;
+    if (i < 0 || i >= rowCount()) return;
+    if (j < 0 || j >= rowCount()) return;
+
+    _contents.swap(i, j);
+    emit dataChanged(createIndex(i, 0), createIndex(i, 0));
+    emit dataChanged(createIndex(j, 0), createIndex(j, 0));
+}
+
+void QamelListModel::moveRows(int first, int last, int dst) {
+    int lastDst = dst + (last - first);
+
+    if (first < 0 || first >= rowCount()) return;
+    if (last < 0 || last >= rowCount()) return;
+    if (dst< 0 || dst >= rowCount()) return;
+    if (lastDst < 0 || lastDst >= rowCount()) return;
+
+    beginMoveRows(QModelIndex(), first, last, QModelIndex(), dst);
+    for (int i = last; i >= first; --i) {
+        _contents.move(i, lastDst - (last - i));
+    }
+    endMoveRows();
+
+    emit contentsChanged();
+}
+
+void QamelListModel_RegisterQML(char* uri, int versionMajor, int versionMinor, char* qmlName) {
+    qmlRegisterType<QamelListModel>(uri, versionMajor, versionMinor, qmlName);
+}
+
+#include "moc-listmodel.h"
