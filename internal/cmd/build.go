@@ -137,7 +137,7 @@ func buildHandler(cmd *cobra.Command, args []string) {
 			continue
 		}
 
-		err = generator.CreateMocFile(profile.Moc, fp.Join(qamelDir, fileToMoc))
+		err = generator.CreateMocFile(profile.Moc, fileToMoc)
 		if err != nil {
 			fmt.Println()
 			cRedBold.Printf("Failed to create moc file for %s: %v\n", fileToMoc, err)
