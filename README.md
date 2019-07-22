@@ -14,6 +14,7 @@ Qamel is a simple QML binding for Go, heavily inspired by [`therecipe/qt`](https
 - Since it only binds the small set of Qt's class, the build time is quite fast.
 - It's available as Docker image, which means you can create QML app without installing Qt in your PC. Go is still needed though.
 - The binding itself is really simple and small. I also think I did a good job on commenting my code, so people should be able to fork it easily.
+- It supports [live reload](https://godoc.org/github.com/RadhiFadlillah/qamel#Viewer.WatchResourceDir) which is really useful while working on GUI.
 
 ### Limitation
 
@@ -23,15 +24,13 @@ Qamel is a simple QML binding for Go, heavily inspired by [`therecipe/qt`](https
 
 ### Development Status
 
-First of all, I've created this binding for my job, so it's actively maintained.
-
-However, since I created it for the sake of the job, if the issues are not critical and doesn't affect my job or workflow, it might take a long time before I work on it. Therefore, all PRs and contributors will always be welcomed.
+I've created this binding for my job, so it's actively maintained. However, since I created it for the sake of the job, if the issues are not critical and doesn't affect my job or workflow, it might take a long time before I work on it. Therefore, all PRs and contributors will always be welcomed.
 
 ### Resources
 
 All documentation for this binding is available in [wiki](https://github.com/RadhiFadlillah/qamel/wiki) and [GoDoc](https://godoc.org/github.com/RadhiFadlillah/qamel). There are some important sections in wiki that I recommend you to check before you start developing your QML app :
 
-- [Frequently Asked Questions](https://github.com/RadhiFadlillah/qamel/wiki/Frequently-Asked-Questions-(FAQ))
+- [Frequently Asked Questions](https://github.com/RadhiFadlillah/qamel/wiki/Frequently-Asked-Questions-(FAQ)), especially the [comparison](https://github.com/RadhiFadlillah/qamel/wiki/Frequently-Asked-Questions-(FAQ)#how-does-it-compare-to-therecipeqt-) with other binding.
 - [Getting Started](https://github.com/RadhiFadlillah/qamel/wiki/Getting-Started)
 - [CLI Usage](https://github.com/RadhiFadlillah/qamel/wiki/CLI-Usage)
 - [Building App](https://github.com/RadhiFadlillah/qamel/wiki/Building-Application)
@@ -39,8 +38,9 @@ All documentation for this binding is available in [wiki](https://github.com/Rad
 You might also want to check Qt's official documentation about QML :
 
 - [Qt QML](http://doc.qt.io/qt-5/qtqml-index.html)
-- [QML Reference](http://doc.qt.io/qt-5/qmlreference.html)
 - [All QML Types](http://doc.qt.io/qt-5/qmltypes.html)
+- [QML Reference](http://doc.qt.io/qt-5/qmlreference.html)
+- [QML Code Conventions](https://doc.qt.io/qt-5/qml-codingconventions.html)
 
 For demo, you can check out [Qamel-HN](https://github.com/RadhiFadlillah/qamel-hn), a HackerNews reader built with QML and Go.
 
