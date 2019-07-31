@@ -7,11 +7,8 @@ import (
 	"os"
 	"os/exec"
 	fp "path/filepath"
-	"regexp"
 	"strings"
 )
-
-var rxLddOutput = regexp.MustCompile(`^([^\s]+)\s+=>\s+(.+)\s+\([^)]+\)$`)
 
 // copyLinuxPlugins copies Linux plugins to output directory
 func copyLinuxPlugins(qtPluginsDir string, outputDir string) error {
@@ -92,18 +89,16 @@ func copyLinuxLibs(qtLibsDir string, outputPath string) error {
 		scanner := bufio.NewScanner(buffer)
 
 		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			parts := rxLddOutput.FindStringSubmatch(line)
-			if len(parts) != 3 {
+			lib := strings.TrimSpace(scanner.Text())
+			libName := strings.SplitN(lib, " ", 2)[0]
+			libName = fp.Base(libName)
+			if libName == "" {
 				continue
 			}
 
-			libName := fp.Base(parts[1])
-			libDefaultPath := parts[2]
-
 			libPath := fp.Join(qtLibsDir, libName)
 			if !fileExists(libPath) {
-				libPath = libDefaultPath
+				continue
 			}
 
 			filesToCheck = append(filesToCheck, libPath)
