@@ -247,8 +247,8 @@ func buildHandler(cmd *cobra.Command, args []string) {
 	}
 	cGreen.Println("done")
 
-	// If it's shared mode, copy dependencies
-	if !profile.Static && copyDependencies {
+	// If requested, copy dependencies
+	if copyDependencies {
 		fmt.Print("Copying dependencies...")
 		err = generator.CopyDependencies(profile, projectDir, outputPath)
 		if err != nil {

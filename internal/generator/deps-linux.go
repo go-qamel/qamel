@@ -7,12 +7,14 @@ import (
 	"os"
 	"os/exec"
 	fp "path/filepath"
+	"regexp"
 	"strings"
 )
 
+var rxLddOutput = regexp.MustCompile(`^([^\s]+)\s+=>\s+(.+)\s+\([^)]+\)$`)
+
 // copyLinuxPlugins copies Linux plugins to output directory
-func copyLinuxPlugins(qmakeVars map[string]string, outputDir string) error {
-	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
+func copyLinuxPlugins(qtPluginsDir string, outputDir string) error {
 	dstPluginsDir := fp.Join(outputDir, "plugins")
 	plugins := []string{
 		"platforms/libqxcb.so",
@@ -39,7 +41,7 @@ func copyLinuxPlugins(qmakeVars map[string]string, outputDir string) error {
 }
 
 // copyLinuxLibs copies Linux libraries to output directory
-func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
+func copyLinuxLibs(qtLibsDir string, outputPath string) error {
 	// Get list of files to check.
 	// The first one is the output binary file
 	filesToCheck := []string{outputPath}
@@ -61,7 +63,6 @@ func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 	})
 
 	// Get list of dependency of the files
-	qtLibsDir := qmakeVars["QT_INSTALL_LIBS"]
 	mapDependencies := map[string]string{}
 	filesAlreadyChecked := map[string]struct{}{}
 
@@ -86,21 +87,23 @@ func copyLinuxLibs(qmakeVars map[string]string, outputPath string) error {
 		}
 
 		// Parse ldd results
-		// It will look like this: libname.so => /path/to/lib (memorty address)
+		// It will look like this: libname.so => /path/to/lib (memory address)
 		buffer := bytes.NewBuffer(lddResult)
 		scanner := bufio.NewScanner(buffer)
 
 		for scanner.Scan() {
-			lib := strings.TrimSpace(scanner.Text())
-			libName := strings.SplitN(lib, " ", 2)[0]
-			libName = fp.Base(libName)
-			if libName == "" {
+			line := strings.TrimSpace(scanner.Text())
+			parts := rxLddOutput.FindStringSubmatch(line)
+			if len(parts) != 3 {
 				continue
 			}
 
+			libName := fp.Base(parts[1])
+			libDefaultPath := parts[2]
+
 			libPath := fp.Join(qtLibsDir, libName)
 			if !fileExists(libPath) {
-				continue
+				libPath = libDefaultPath
 			}
 
 			filesToCheck = append(filesToCheck, libPath)

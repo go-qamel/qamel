@@ -11,15 +11,95 @@ import (
 	"github.com/RadhiFadlillah/qamel/internal/config"
 )
 
-// CopyDependencies copies dependecies files to output directory
+// CopyDependencies copies dependencies to output directory
 func CopyDependencies(profile config.Profile, projectDir, outputPath string) error {
+	switch profile.OS {
+	case "linux":
+		return copyLinuxDependencies(profile, projectDir, outputPath)
+	case "windows":
+		return copyWindowsDependencies(profile, projectDir, outputPath)
+	default:
+		return nil
+	}
+}
+
+// copyLinuxDependencies copies dependencies for Linux
+func copyLinuxDependencies(profile config.Profile, projectDir, outputPath string) error {
 	// Get qmake variables from `qmake -query`
-	cmdQmake := exec.Command(profile.Qmake, "-query")
-	btOutput, err := cmdQmake.CombinedOutput()
+	qmakeVars, err := getQmakeVars(profile.Qmake)
 	if err != nil {
-		return fmt.Errorf("%v\n%s", err, btOutput)
+		return err
 	}
 
+	// Get dirs
+	outputDir := fp.Dir(outputPath)
+	qtQmlDir := qmakeVars["QT_INSTALL_QML"]
+	qtLibsDir := qmakeVars["QT_INSTALL_LIBS"]
+	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
+
+	// If in shared mode, copy QML and plugins
+	if !profile.Static {
+		err = copyQmlDependencies(qtQmlDir, profile, projectDir, outputDir)
+		if err != nil {
+			return err
+		}
+
+		err = copyLinuxPlugins(qtPluginsDir, outputDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Copy libs
+	err = copyLinuxLibs(qtLibsDir, outputPath)
+	if err != nil {
+		return err
+	}
+
+	// Create script
+	return createLinuxScript(outputPath)
+}
+
+// copyWindowsDependencies copies dependencies for Windows
+func copyWindowsDependencies(profile config.Profile, projectDir, outputPath string) error {
+	// Get qmake variables from `qmake -query`
+	qmakeVars, err := getQmakeVars(profile.Qmake)
+	if err != nil {
+		return err
+	}
+
+	// Get dirs
+	outputDir := fp.Dir(outputPath)
+	qtQmlDir := qmakeVars["QT_INSTALL_QML"]
+	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
+
+	// If in shared mode, copy QML and plugins
+	if !profile.Static {
+		err = copyQmlDependencies(qtQmlDir, profile, projectDir, outputDir)
+		if err != nil {
+			return err
+		}
+
+		err = copyWindowsPlugins(qtPluginsDir, outputDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Copy libs
+	return copyWindowsLibs(profile, outputPath)
+}
+
+// getQmakeVars get the qmake properties by running `qmake -query`
+func getQmakeVars(qmakePath string) (map[string]string, error) {
+	// Run qmake
+	cmdQmake := exec.Command(qmakePath, "-query")
+	btOutput, err := cmdQmake.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("%v\n%s", err, btOutput)
+	}
+
+	// Parse output
 	buffer := bytes.NewBuffer(btOutput)
 	scanner := bufio.NewScanner(buffer)
 	qmakeVars := map[string]string{}
@@ -34,46 +114,5 @@ func CopyDependencies(profile config.Profile, projectDir, outputPath string) err
 		qmakeVars[name] = value
 	}
 
-	// Copy QML
-	outputDir := fp.Dir(outputPath)
-	err = copyQmlDependencies(qmakeVars, profile, projectDir, outputDir)
-	if err != nil {
-		return err
-	}
-
-	// Copy OS specific libraries
-	switch profile.OS {
-	case "linux":
-		return copyLinuxDependencies(qmakeVars, outputPath)
-	case "windows":
-		return copyWindowsDependencies(qmakeVars, profile, outputPath)
-	}
-	return nil
-}
-
-// copyLinuxDependencies copies dependecies files for Linux target
-func copyLinuxDependencies(qmakeVars map[string]string, outputPath string) error {
-	// Copy plugins
-	err := copyLinuxPlugins(qmakeVars, fp.Dir(outputPath))
-	if err != nil {
-		return err
-	}
-
-	err = copyLinuxLibs(qmakeVars, outputPath)
-	if err != nil {
-		return err
-	}
-
-	return createLinuxScript(outputPath)
-}
-
-// copyWindowsDependencies copies dependecies files for Windows target
-func copyWindowsDependencies(qmakeVars map[string]string, profile config.Profile, outputPath string) error {
-	// Copy plugins
-	err := copyWindowsPlugins(qmakeVars, fp.Dir(outputPath))
-	if err != nil {
-		return err
-	}
-
-	return copyWindowsLibs(qmakeVars, profile, outputPath)
+	return qmakeVars, nil
 }

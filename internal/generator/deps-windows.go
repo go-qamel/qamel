@@ -14,8 +14,7 @@ import (
 )
 
 // copyWindowsPlugins copies Windows plugins to output directory
-func copyWindowsPlugins(qmakeVars map[string]string, outputDir string) error {
-	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
+func copyWindowsPlugins(qtPluginsDir string, outputDir string) error {
 	plugins := []string{
 		"platforms/qwindows.dll",
 		"imageformats",
@@ -51,7 +50,7 @@ func copyWindowsPlugins(qmakeVars map[string]string, outputDir string) error {
 }
 
 // copyWindowsLibs copies Windows libraries to output directory
-func copyWindowsLibs(qmakeVars map[string]string, profile config.Profile, outputPath string) error {
+func copyWindowsLibs(profile config.Profile, outputPath string) error {
 	// Get list of files to check.
 	// The first one is the output binary file
 	filesToCheck := []string{outputPath}

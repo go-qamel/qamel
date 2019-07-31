@@ -14,7 +14,7 @@ import (
 var rxQmlImport = regexp.MustCompile(`^import\s+(Qt\S+)\s(\d)+.*$`)
 
 // copyQmlDependencies copies QML dependencies to output dir
-func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, projectDir, outputDir string) error {
+func copyQmlDependencies(qtQmlDir string, profile config.Profile, projectDir, outputDir string) error {
 	// Get list of dir to check
 	dirToCheck := []string{}
 	projectResDir := fp.Join(projectDir, "res")
@@ -24,7 +24,6 @@ func copyQmlDependencies(qmakeVars map[string]string, profile config.Profile, pr
 	}
 
 	// Get list of QML dependencies
-	qtQmlDir := qmakeVars["QT_INSTALL_QML"]
 	mapDependencies := map[string]struct{}{}
 	dirAlreadyChecked := map[string]struct{}{}
 
