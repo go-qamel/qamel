@@ -15,10 +15,10 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
-    apt-get -qq -y install build-essential libglib2.0-dev libglu1-mesa-dev libpulse-dev \
-        fontconfig libasound2 libegl1-mesa libnss3 libpci3 libxcomposite1 libxcursor1 \
-        libxi6 libxrandr2 libxtst6 libfontconfig1-dev libfreetype6-dev libxrender-dev \
-        libxkbcommon-dev && \
+    apt-get -qq -y install build-essential libgl1-mesa-dev \
+        libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev \
+        libxfixes-dev libxi-dev libxrender-dev libxcb1-dev \
+        libx11-xcb-dev libxcb-glx0-dev libxkbcommon-x11-dev && \
     apt-get -qq clean
 
 # Install ccache for faster build
