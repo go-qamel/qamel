@@ -12,26 +12,31 @@ RUN apt-get -qq update && \
 RUN curl -SL --retry 10 --retry-delay 60 https://dl.google.com/go/go$GO_VERSION.linux-amd64.tar.gz | \
     tar -xzC /usr/local
 
+# Install Qt5 dependencies
+RUN apt-get -qq update && \
+    apt-get -qq -y install dbus libfontconfig1 libx11-6 libx11-xcb1
+
 # Download Qt5
 RUN curl -SL --retry 10 --retry-delay 60 -O \
     https://download.qt.io/official_releases/qt/$QT_MAJOR/$QT_VERSION/qt-opensource-linux-x64-$QT_VERSION.run
 
-# Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel
+# Download Qt5 installation script
+RUN curl -SL --retry 10 --retry-delay 60 -O \
+    https://raw.githubusercontent.com/RadhiFadlillah/qamel/master/build/docker/installer-script.qs #c35715
 
 # Install Qt5
-RUN apt-get -qq update && \
-    apt-get -qq -y install dbus libfontconfig1 libx11-6 libx11-xcb1
-
 RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
     ./qt-opensource-linux-x64-$QT_VERSION.run -v \
-        --script $GOPATH/src/github.com/RadhiFadlillah/qamel/build/docker/installer-script.qs \
+        --script installer-script.qs \
         --platform minimal
 
 # Clean up after installing Qt5
 RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
             /opt/Qt$QT_VERSION/Examples \
             /opt/Qt$QT_VERSION/Tools
+
+# Install Qamel
+RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel #7e3e3b
 
 # ========== END OF BASE ========== #
 
@@ -44,9 +49,10 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
-    apt-get -qq -y install \
-        build-essential libgl1-mesa-dev libfontconfig1-dev libglib2.0-dev \
-        libglu1-mesa-dev libxrender1 libdbus-1-dev libpulse-dev && \
+    apt-get -qq -y install build-essential libgl1-mesa-dev \
+        libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev \
+        libxfixes-dev libxi-dev libxrender-dev libxcb1-dev \
+        libx11-xcb-dev libxcb-glx0-dev libxkbcommon-x11-dev && \
     apt-get -qq clean
 
 # Install ccache for faster build
