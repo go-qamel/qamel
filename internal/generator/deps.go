@@ -37,17 +37,16 @@ func copyLinuxDependencies(profile config.Profile, projectDir, outputPath string
 	qtLibsDir := qmakeVars["QT_INSTALL_LIBS"]
 	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
 
-	// If in shared mode, copy QML and plugins
-	if !profile.Static {
-		err = copyQmlDependencies(qtQmlDir, profile, projectDir, outputDir)
-		if err != nil {
-			return err
-		}
+	// Copy QML
+	err = copyQmlDependencies(qtQmlDir, profile, projectDir, outputDir)
+	if err != nil {
+		return err
+	}
 
-		err = copyLinuxPlugins(qtPluginsDir, outputDir)
-		if err != nil {
-			return err
-		}
+	// Copy plugins
+	err = copyLinuxPlugins(qtPluginsDir, outputDir)
+	if err != nil {
+		return err
 	}
 
 	// Copy libs
@@ -73,17 +72,16 @@ func copyWindowsDependencies(profile config.Profile, projectDir, outputPath stri
 	qtQmlDir := qmakeVars["QT_INSTALL_QML"]
 	qtPluginsDir := qmakeVars["QT_INSTALL_PLUGINS"]
 
-	// If in shared mode, copy QML and plugins
-	if !profile.Static {
-		err = copyQmlDependencies(qtQmlDir, profile, projectDir, outputDir)
-		if err != nil {
-			return err
-		}
+	// Copy QML
+	err = copyQmlDependencies(qtQmlDir, profile, projectDir, outputDir)
+	if err != nil {
+		return err
+	}
 
-		err = copyWindowsPlugins(qtPluginsDir, outputDir)
-		if err != nil {
-			return err
-		}
+	// Copy plugins
+	err = copyWindowsPlugins(qtPluginsDir, outputDir)
+	if err != nil {
+		return err
 	}
 
 	// Copy libs
