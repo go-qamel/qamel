@@ -311,7 +311,7 @@ func (view Viewer) WatchResourceDir(dirPath string) {
 	}
 
 	// Watch for files change
-	logrus.Infoln("File watcher enabled for ", dirPath)
+	logrus.Infoln("File watcher enabled for", dirPath)
 	logrus.Infoln("Only use it in safe environment")
 
 	lastEvent := struct {
