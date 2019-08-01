@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base
+FROM ubuntu:16.04 as base
 
 # Download source of Qt5
 RUN apt-get -qq update && \
@@ -14,7 +14,8 @@ RUN apt-get -qq update && \
     apt-get -qq -y install python libgl1-mesa-dev \
     libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev \
     libxfixes-dev libxi-dev libxrender-dev libxcb1-dev \
-    libx11-xcb-dev libxcb-glx0-dev libxkbcommon-x11-dev
+    libx11-xcb-dev libxcb-glx0-dev libxkbcommon-dev \
+    libxkbcommon-x11-dev '^libxcb.*-dev'
 
 # Build Qt5 static
 RUN cd qt-everywhere-src-$QT_VERSION && \
@@ -23,7 +24,7 @@ RUN cd qt-everywhere-src-$QT_VERSION && \
         -optimize-size -strip -fontconfig \
         -qt-zlib -qt-libjpeg -qt-libpng -qt-xcb \
         -qt-pcre -qt-harfbuzz -qt-doubleconversion \
-        -make libs -nomake tools -nomake examples -nomake tests \
+        -nomake tools -nomake examples -nomake tests \
         -no-pch -skip qtwebengine && \
     make -j $(grep -c ^processor /proc/cpuinfo) && \
     make install -j $(grep -c ^processor /proc/cpuinfo)

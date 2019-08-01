@@ -2,7 +2,7 @@ FROM radhifadlillah/qamel:linux as linux
 
 # ========== END OF LINUX ========== #
 
-FROM ubuntu:18.04 as base
+FROM ubuntu:16.04 as base
 
 RUN apt-get -qq update && \
     apt-get -qq -y install software-properties-common apt-transport-https
@@ -14,7 +14,7 @@ RUN apt-get -qq update && \
 
 # ========== END OF BASE ========== #
 
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go

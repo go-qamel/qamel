@@ -6,7 +6,7 @@ FROM radhifadlillah/qamel:qt-static as base
 
 # ========== END OF BASE ========== #
 
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
@@ -15,10 +15,11 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
-    apt-get -qq -y install build-essential libgl1-mesa-dev \
-        libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev \
-        libxfixes-dev libxi-dev libxrender-dev libxcb1-dev \
-        libx11-xcb-dev libxcb-glx0-dev libxkbcommon-x11-dev && \
+    apt-get -qq -y install python libgl1-mesa-dev \
+    libfontconfig1-dev libfreetype6-dev libx11-dev libxext-dev \
+    libxfixes-dev libxi-dev libxrender-dev libxcb1-dev \
+    libx11-xcb-dev libxcb-glx0-dev libxkbcommon-dev \
+    libxkbcommon-x11-dev '^libxcb.*-dev' && \
     apt-get -qq clean
 
 # Install ccache for faster build

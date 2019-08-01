@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 as base
+FROM ubuntu:16.04 as base
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
@@ -36,11 +36,11 @@ RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
             /opt/Qt$QT_VERSION/Tools
 
 # Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel #7e3e3b
+RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel #f1e22ae
 
 # ========== END OF BASE ========== #
 
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
