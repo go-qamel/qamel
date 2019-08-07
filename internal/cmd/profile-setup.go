@@ -183,10 +183,12 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	defaultGcc := "gcc"
 	defaultGxx := "g++"
 	defaultObjdump := "objdump"
+	defaultRes := "windres"
 	if runtime.GOOS == "windows" {
 		defaultGcc += ".exe"
 		defaultGxx += ".exe"
 		defaultObjdump += ".exe"
+		defaultRes += ".exe"
 	}
 
 	fmt.Println()
@@ -232,10 +234,20 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 		cCyanBold.Print("Path to windres : ")
 		windresPath, _ = reader.ReadString('\n')
 		windresPath = strings.TrimSpace(windresPath)
-		if !fileExists(windresPath) {
-			cRedBold.Println("The specified path does not exist")
-			os.Exit(1)
+		if windresPath == "" {
+			windresPath = defaultRes
+		} else {
+			if !strings.HasSuffix(windresPath, defaultRes) {
+				windresPath = fp.Join(windresPath, defaultRes)
+			}
+			windresPath = strings.ReplaceAll(windresPath, "Program Files", "Progra~1")
+			windresPath = strings.ReplaceAll(windresPath, "Program Files (x86)", "Progra~2")
+			if !fileExists(windresPath) {
+				cRedBold.Println("The specified path does not exist")
+				os.Exit(1)
+			}
 		}
+
 	}
 
 	// Save config file
