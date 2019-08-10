@@ -32,5 +32,9 @@ func CreateSysoFile(profile config.Profile, projectDir string) error {
 	// Create syso file
 	sysoFilePath := fp.Join(projectDir, "qamel-icon.syso")
 	cmdWindres := exec.Command(profile.Windres, "-i", rcFilePath, "-o", sysoFilePath)
-	return cmdWindres.Run()
+	if btOutput, err := cmdWindres.CombinedOutput(); err != nil {
+		return fmt.Errorf("%v: %s", err, btOutput)
+	}
+
+	return nil
 }

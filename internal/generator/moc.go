@@ -23,5 +23,9 @@ func CreateMocFile(mocPath string, src string) error {
 
 	// Run moc
 	cmdMoc := exec.Command(mocPath, "-o", dst, src)
-	return cmdMoc.Run()
+	if btOutput, err := cmdMoc.CombinedOutput(); err != nil {
+		return fmt.Errorf("%v: %s", err, btOutput)
+	}
+
+	return nil
 }
