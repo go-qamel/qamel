@@ -2,9 +2,9 @@ Qamel
 -----
 
 [![GoDoc](https://godoc.org/github.com/RadhiFadlillah/qamel?status.png)](https://godoc.org/github.com/RadhiFadlillah/qamel)
-[![Donate](https://img.shields.io/badge/donate-PayPal-green.svg)](https://www.paypal.me/RadhiFadlillah)
 [![Docker](https://img.shields.io/badge/docker-qamel-blue.svg)](https://hub.docker.com/r/radhifadlillah/qamel)
-
+[![Donate](https://img.shields.io/badge/donate-PayPal-green.svg)](https://www.paypal.me/RadhiFadlillah)
+[![Donate](https://img.shields.io/badge/donate-Ko--fi-brightgreen)](https://ko-fi.com/radhifadlillah)
 
 Qamel is a simple QML binding for Go, heavily inspired by [`therecipe/qt`](https://github.com/therecipe/qt). This package only binds Qt's classes that used for creating a simple QML app, i.e. `QApplication`, `QQuickView` and `QQMLApplicationEngine`. It's still work-in progress, however it should be stable enough to use in production (as in I'm already using it in prod without problem, your situations may vary).
 
@@ -46,4 +46,4 @@ For demo, you can check out [Qamel-HN](https://github.com/RadhiFadlillah/qamel-h
 
 ### Licenses
 
-Qamel is distributed under [MIT license](https://choosealicense.com/licenses/mit/), which means you can use and modify it however you want. However, if you make an enhancement for it, if possible, please send a pull request.
+Qamel is distributed under [MIT license](https://choosealicense.com/licenses/mit/), which means you can use and modify it however you want. However, if you make an enhancement for it, if possible, please send a pull request. If you like this project, please consider donating to me either via [PayPal](https://www.paypal.me/RadhiFadlillah) or [Ko-Fi](https://ko-fi.com/radhifadlillah).
