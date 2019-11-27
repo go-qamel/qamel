@@ -1,3 +1,3 @@
 package main
 
-var version = "972957305a6562404e5f2c11b3a34f3387301ac7"
+var version = "293d0591d9a111b1490b290ce96524b4d3bff698"

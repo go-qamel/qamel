@@ -1,14 +1,14 @@
-package listmodel
+package qamel
 
 // #include <stdlib.h>
 // #include <stdint.h>
 // #include <string.h>
-// #include "listmodel.h"
+// #include "tablemodel.h"
 import "C"
 import "unsafe"
 
-// RegisterQML registers QamelListModel as QML object
-func RegisterQML(uri string, versionMajor int, versionMinor int, qmlName string) {
+// RegisterQmlTableModel registers QamelTableModel as QML object
+func RegisterQmlTableModel(uri string, versionMajor int, versionMinor int, qmlName string) {
 	cURI := C.CString(uri)
 	cQmlName := C.CString(qmlName)
 	cVersionMajor := C.int(int32(versionMajor))
@@ -18,5 +18,5 @@ func RegisterQML(uri string, versionMajor int, versionMinor int, qmlName string)
 		C.free(unsafe.Pointer(cQmlName))
 	}()
 
-	C.QamelListModel_RegisterQML(cURI, cVersionMajor, cVersionMinor, cQmlName)
+	C.QamelTableModel_RegisterQML(cURI, cVersionMajor, cVersionMinor, cQmlName)
 }
