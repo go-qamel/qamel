@@ -66,7 +66,7 @@ func dockerHandler(cmd *cobra.Command, args []string) {
 
 	// If this project uses Go module, vendor it first before
 	// passing it to Docker
-	vendorDir := fp.Join(projectDir, "vendor", "github.com", "RadhiFadlillah", "qamel")
+	vendorDir := fp.Join(projectDir, "vendor", "github.com", "go-qamel", "qamel")
 	goModFile := fp.Join(projectDir, "go.mod")
 	usesGoModule := fileExists(goModFile)
 

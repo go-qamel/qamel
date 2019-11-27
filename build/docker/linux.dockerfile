@@ -22,7 +22,7 @@ RUN curl -SL --retry 10 --retry-delay 60 -O \
 
 # Download Qt5 installation script
 RUN curl -SL --retry 10 --retry-delay 60 -O \
-    https://raw.githubusercontent.com/RadhiFadlillah/qamel/master/build/docker/installer-script.qs #c35715
+    https://raw.githubusercontent.com/go-qamel/qamel/master/build/docker/installer-script.qs #6307da
 
 # Install Qt5
 RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
@@ -36,7 +36,7 @@ RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
             /opt/Qt$QT_VERSION/Tools
 
 # Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #0a15b9
+RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #6307da
 
 # ========== END OF BASE ========== #
 
