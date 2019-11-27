@@ -20,6 +20,10 @@ ENV HOME /home/user
 ENV GOPATH $HOME/go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
+# Install ca-certificates which might be needed by Go proxy
+RUN apt-get -qq update && \
+    apt-get -qq -y install ca-certificates git
+
 # Copy Go and Qamel from linux
 COPY --from=linux /usr/local/go /usr/local/go
 COPY --from=linux $GOPATH/bin $GOPATH/bin

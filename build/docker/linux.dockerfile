@@ -22,7 +22,7 @@ RUN curl -SL --retry 10 --retry-delay 60 -O \
 
 # Download Qt5 installation script
 RUN curl -SL --retry 10 --retry-delay 60 -O \
-    https://raw.githubusercontent.com/go-qamel/qamel/master/build/docker/installer-script.qs #6307da
+    https://raw.githubusercontent.com/go-qamel/qamel/master/build/docker/installer-script.qs #0fabfd
 
 # Install Qt5
 RUN chmod +x qt-opensource-linux-x64-$QT_VERSION.run && \
@@ -36,7 +36,7 @@ RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
             /opt/Qt$QT_VERSION/Tools
 
 # Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #6307da
+RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #0fabfd
 
 # ========== END OF BASE ========== #
 
@@ -46,6 +46,10 @@ ENV HOME /home/user
 ENV GOPATH $HOME/go
 ENV QT_VERSION 5.13.2
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+
+# Install ca-certificates which might be needed by Go proxy
+RUN apt-get -qq update && \
+    apt-get -qq -y install ca-certificates git
 
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
@@ -76,9 +80,9 @@ RUN printf '%s %s %s %s %s %s %s %s %s %s\n' \
     '"OS":"linux",' \
     '"Arch":"amd64",' \
     '"Static":false,' \
-    '"Qmake":"/opt/Qt5.13.0/5.13.0/gcc_64/bin/qmake",' \
-    '"Moc":"/opt/Qt5.13.0/5.13.0/gcc_64/bin/moc",' \
-    '"Rcc":"/opt/Qt5.13.0/5.13.0/gcc_64/bin/rcc",' \
+    '"Qmake":"/opt/Qt5.13.2/5.13.2/gcc_64/bin/qmake",' \
+    '"Moc":"/opt/Qt5.13.2/5.13.2/gcc_64/bin/moc",' \
+    '"Rcc":"/opt/Qt5.13.2/5.13.2/gcc_64/bin/rcc",' \
     '"Gcc":"gcc",' \
     '"Gxx":"g++"' \
     '}}' > $HOME/.config/qamel/config.json

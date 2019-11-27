@@ -13,6 +13,10 @@ ENV GOPATH $HOME/go
 ENV QT_VERSION 5.13.2
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
+# Install ca-certificates which might be needed by Go proxy
+RUN apt-get -qq update && \
+    apt-get -qq -y install ca-certificates git
+
 # Install dependencies for Qt5
 RUN apt-get -qq update && \
     apt-get -qq -y install python libgl1-mesa-dev \
@@ -43,9 +47,9 @@ RUN printf '%s %s %s %s %s %s %s %s %s %s\n' \
     '"OS":"linux",' \
     '"Arch":"amd64",' \
     '"Static":true,' \
-    '"Qmake":"/opt/Qt5.13.0/bin/qmake",' \
-    '"Moc":"/opt/Qt5.13.0/bin/moc",' \
-    '"Rcc":"/opt/Qt5.13.0/bin/rcc",' \
+    '"Qmake":"/opt/Qt5.13.2/bin/qmake",' \
+    '"Moc":"/opt/Qt5.13.2/bin/moc",' \
+    '"Rcc":"/opt/Qt5.13.2/bin/rcc",' \
     '"Gcc":"gcc",' \
     '"Gxx":"g++"' \
     '}}' > $HOME/.config/qamel/config.json
