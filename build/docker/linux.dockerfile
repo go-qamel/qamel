@@ -36,7 +36,7 @@ RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
             /opt/Qt$QT_VERSION/Tools
 
 # Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #9729573
+RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #0a15b9
 
 # ========== END OF BASE ========== #
 
