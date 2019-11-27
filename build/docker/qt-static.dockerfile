@@ -5,7 +5,7 @@ RUN apt-get -qq update && \
     apt-get -qq -y install curl build-essential 
 
 ENV QT_MAJOR 5.13
-ENV QT_VERSION 5.13.0
+ENV QT_VERSION 5.13.2
 RUN curl -SL --retry 10 --retry-delay 60 https://download.qt.io/official_releases/qt/$QT_MAJOR/$QT_VERSION/single/qt-everywhere-src-$QT_VERSION.tar.xz | \
     tar -xJC /
 

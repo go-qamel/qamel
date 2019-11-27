@@ -2,9 +2,9 @@ FROM ubuntu:16.04 as base
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
-ENV GO_VERSION 1.12.6
+ENV GO_VERSION 1.13.4
 ENV QT_MAJOR 5.13
-ENV QT_VERSION 5.13.0
+ENV QT_VERSION 5.13.2
 
 # Install Go
 RUN apt-get -qq update && \
@@ -44,7 +44,7 @@ FROM ubuntu:16.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
-ENV QT_VERSION 5.13.0
+ENV QT_VERSION 5.13.2
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install dependencies for Qt5

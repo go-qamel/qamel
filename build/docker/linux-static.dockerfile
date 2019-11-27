@@ -10,7 +10,7 @@ FROM ubuntu:16.04
 
 ENV HOME /home/user
 ENV GOPATH $HOME/go
-ENV QT_VERSION 5.13.0
+ENV QT_VERSION 5.13.2
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Install dependencies for Qt5
