@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/RadhiFadlillah/qamel"
+	"github.com/go-qamel/qamel"
 )
 
 // BackEnd is the bridge for communicating between QML and Go

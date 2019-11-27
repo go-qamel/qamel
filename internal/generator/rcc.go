@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	fp "path/filepath"
 
-	"github.com/RadhiFadlillah/qamel/internal/config"
+	"github.com/go-qamel/qamel/internal/config"
 )
 
 // ErrNoResourceDir is error that fired when resource directory doesn't exist
@@ -27,7 +27,7 @@ func CreateRccFile(profile config.Profile, projectDir string) error {
 	}
 
 	// Get list of file inside resource dir
-	resFiles := []string{}
+	var resFiles []string
 	fp.Walk(resDir, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil

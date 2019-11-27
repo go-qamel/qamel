@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/internal/config"
+	"github.com/go-qamel/qamel/internal/config"
 )
 
 var rxQmlImport = regexp.MustCompile(`^import\s+(Qt\S+)\s(\d)+.*$`)
@@ -16,7 +16,7 @@ var rxQmlImport = regexp.MustCompile(`^import\s+(Qt\S+)\s(\d)+.*$`)
 // copyQmlDependencies copies QML dependencies to output dir
 func copyQmlDependencies(qtQmlDir string, profile config.Profile, projectDir, outputDir string) error {
 	// Get list of dir to check
-	dirToCheck := []string{}
+	var dirToCheck []string
 	projectResDir := fp.Join(projectDir, "res")
 
 	if dirExists(projectResDir) {
@@ -117,7 +117,7 @@ func getQmlDependenciesFromDir(qtQmlDir string, srcDir string) ([]string, error)
 	}
 
 	// Fetch each QML file inside the specified dir
-	qmlFiles := []string{}
+	var qmlFiles []string
 	fp.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() && fp.Ext(info.Name()) == ".qml" {
 			qmlFiles = append(qmlFiles, path)
@@ -139,7 +139,7 @@ func getQmlDependenciesFromDir(qtQmlDir string, srcDir string) ([]string, error)
 	}
 
 	// Convert map to arrays
-	results := []string{}
+	var results []string
 	for depName := range mapDependencies {
 		results = append(results, depName)
 	}
@@ -158,7 +158,7 @@ func getQmlDependenciesFromFile(qtQmlDir string, qmlFilePath string) ([]string, 
 	defer qmlFile.Close()
 
 	// Read each line from the file
-	results := []string{}
+	var results []string
 	scanner := bufio.NewScanner(qmlFile)
 	for scanner.Scan() {
 		// Use regex to find import line

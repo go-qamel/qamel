@@ -181,7 +181,7 @@ func createCppFile(mocPath string, obj object) error {
 
 	// the real signals
 	for i, signal := range obj.signals {
-		params := []string{}
+		var params []string
 		for _, param := range signal.parameters {
 			paramType := mapGoType[param.memberType].inCpp
 			strParam := fmt.Sprintf("%s %s", paramType, param.name)
@@ -204,7 +204,7 @@ func createCppFile(mocPath string, obj object) error {
 			returnType = mapGoType[slot.returns[0].memberType].inCpp
 		}
 
-		params := []string{}
+		var params []string
 		paramNames := []string{"this"}
 		for _, param := range slot.parameters {
 			paramType := mapGoType[param.memberType].inCpp
@@ -278,9 +278,8 @@ func createCppFile(mocPath string, obj object) error {
 	// for invoking signals
 	result += "\n"
 	for i, signal := range obj.signals {
+		var invokerParams []string
 		params := []string{"void* ptr"}
-		invokerParams := []string{}
-
 		for _, param := range signal.parameters {
 			paramType := mapGoType[param.memberType].inCpp
 			paramHeaderType := mapGoType[param.memberType].inC
@@ -353,11 +352,11 @@ func createGoFile(obj object) error {
 		`import "C"`+"\n", hFileName)
 
 	// Write clause for importing Go packages
-	result += fmt.Sprintln("" +
+	result += "" +
 		"import (\n" +
 		`"unsafe"` + "\n" +
-		`"github.com/RadhiFadlillah/qamel"` + "\n" +
-		")\n")
+		`"github.com/go-qamel/qamel"` + "\n" +
+		")\n"
 
 	// Write function for C constructor
 	cClassName := upperChar(obj.name, 0)
@@ -391,9 +390,9 @@ func createGoFile(obj object) error {
 			cgoReturnType = fmt.Sprintf("(result %s)", mapGoType[returnType].inCgo)
 		}
 
+		var castedNames []string
+		var castedParams []string
 		params := []string{"ptr unsafe.Pointer"}
-		castedNames := []string{}
-		castedParams := []string{}
 		for _, param := range slot.parameters {
 			cgoType := mapGoType[param.memberType].inCgo
 			strParam := fmt.Sprintf("%s %s", param.name, cgoType)
@@ -474,9 +473,9 @@ func createGoFile(obj object) error {
 	// for invoking signals
 	result += "// signals invoker\n\n"
 	for _, signal := range obj.signals {
-		params := []string{}
+		var params []string
+		var castedParams []string
 		castedNames := []string{"obj.Ptr"}
-		castedParams := []string{}
 		for _, param := range signal.parameters {
 			strParam := fmt.Sprintf("%s %s", param.name, param.memberType)
 			castedName := fmt.Sprintf("c%s", upperChar(param.name, 0))

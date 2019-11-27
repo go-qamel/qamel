@@ -5,7 +5,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/RadhiFadlillah/qamel/internal/config"
+	"github.com/go-qamel/qamel/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ func profileListHandler(cmd *cobra.Command, args []string) {
 	}
 
 	// Get list of profile name
-	names := []string{}
+	var names []string
 	for key := range profiles {
 		names = append(names, key)
 	}

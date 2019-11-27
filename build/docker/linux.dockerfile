@@ -36,7 +36,7 @@ RUN rm -Rf /opt/Qt$QT_VERSION/Docs \
             /opt/Qt$QT_VERSION/Tools
 
 # Install Qamel
-RUN /usr/local/go/bin/go get -u github.com/RadhiFadlillah/qamel/cmd/qamel #f1e22ae
+RUN /usr/local/go/bin/go get -u github.com/go-qamel/qamel/cmd/qamel #f1e22ae
 
 # ========== END OF BASE ========== #
 
@@ -64,7 +64,7 @@ ENV PATH "/usr/lib/ccache:$PATH"
 # Copy Go and Qamel from base
 COPY --from=base /usr/local/go /usr/local/go
 COPY --from=base $GOPATH/bin $GOPATH/bin
-COPY --from=base $GOPATH/src/github.com/RadhiFadlillah/qamel $GOPATH/src/github.com/RadhiFadlillah/qamel
+COPY --from=base $GOPATH/src/github.com/go-qamel/qamel $GOPATH/src/github.com/go-qamel/qamel
 
 # Copy Qt5 from base
 COPY --from=base /opt/Qt$QT_VERSION /opt/Qt$QT_VERSION

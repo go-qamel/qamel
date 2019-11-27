@@ -8,8 +8,8 @@ import (
 	fp "path/filepath"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/internal/config"
-	"github.com/RadhiFadlillah/qamel/internal/generator"
+	"github.com/go-qamel/qamel/internal/config"
+	"github.com/go-qamel/qamel/internal/generator"
 	"github.com/spf13/cobra"
 )
 

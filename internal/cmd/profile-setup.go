@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/internal/config"
+	"github.com/go-qamel/qamel/internal/config"
 	"github.com/spf13/cobra"
 )
 

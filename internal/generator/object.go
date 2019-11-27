@@ -11,12 +11,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/RadhiFadlillah/qamel/internal/config"
+	"github.com/go-qamel/qamel/internal/config"
 )
 
 var (
 	qamelImportName = "qamel"
-	qamelImportPath = "github.com/RadhiFadlillah/qamel"
+	qamelImportPath = "github.com/go-qamel/qamel"
 	qamelObjectName = "QmlObject"
 
 	rxNumber = regexp.MustCompile(`\d`)
@@ -62,7 +62,7 @@ func CreateQmlObjectCode(profile config.Profile, projectDir string, buildTags ..
 	}
 
 	// For each sub directories, find Go files with matching build tags
-	goFiles := []string{}
+	var goFiles []string
 	buildCtx := build.Default
 	buildCtx.BuildTags = append([]string{}, buildTags...)
 	for _, dir := range subDirs {
@@ -79,7 +79,7 @@ func CreateQmlObjectCode(profile config.Profile, projectDir string, buildTags ..
 	}
 
 	// From each Go files, find struct with qamel.QmlObject embedded to it
-	qmlObjects := []object{}
+	var qmlObjects []object
 	for _, goFile := range goFiles {
 		objects, err := getQmlObjectStructs(goFile)
 		if err != nil {
@@ -89,7 +89,7 @@ func CreateQmlObjectCode(profile config.Profile, projectDir string, buildTags ..
 	}
 
 	// Parse each qml objects
-	errors := []error{}
+	var errors []error
 	for i, obj := range qmlObjects {
 		tmpObj, tmpErrors := parseQmlObject(obj)
 		errors = append(errors, tmpErrors...)
@@ -162,7 +162,7 @@ func getQmlObjectStructs(goFile string) ([]object, error) {
 	}
 
 	// Traverse file tree to find struct that embedding QmlObject
-	result := []object{}
+	var result []object
 	embeddedName := fmt.Sprintf("%s.%s", importName, qamelObjectName)
 	ast.Inspect(f, func(node ast.Node) bool {
 		// Make sure this node is a declaration of `type`
@@ -218,11 +218,13 @@ func getQmlObjectStructs(goFile string) ([]object, error) {
 
 // parseNode parse struct nodes inside object and find the property, signal and slots
 func parseQmlObject(obj object) (object, []error) {
-	errors := []error{}
-	slots := []objectMethod{}
-	signals := []objectMethod{}
-	properties := []objectMember{}
-	constructors := []objectMethod{}
+	var (
+		errors       []error
+		slots        []objectMethod
+		signals      []objectMethod
+		properties   []objectMember
+		constructors []objectMethod
+	)
 
 	nPropName := map[string]int{}
 	nSignalName := map[string]int{}
@@ -446,7 +448,7 @@ func parseAstFuncParams(fieldList *ast.FieldList) []objectMember {
 
 	// Get name and type of each parameter
 	paramIdx := 0
-	result := []objectMember{}
+	var result []objectMember
 	for _, param := range fieldList.List {
 		if len(param.Names) == 0 {
 			result = append(result, objectMember{
