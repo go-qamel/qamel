@@ -14,7 +14,7 @@ var (
 func init() {
 	// Get config path in ${XDG_CONFIG_HOME}/qamel/config.json
 	var err error
-	userScope := ap.NewScope(ap.User, "qamel", "qamel")
+	userScope := ap.NewScope(ap.User, "qamel")
 	configPath, err = userScope.ConfigPath("config.json")
 	if err != nil {
 		log.Fatalln(err)
