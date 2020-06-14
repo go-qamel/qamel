@@ -133,6 +133,15 @@ func createCgoFlags(profile config.Profile, projectDir string) (string, error) {
 		return "", err
 	}
 
+    if _, ok := mapCompiler["EXPORT_ARCH_ARGS"]; ok {
+        if profile.Arch == "amd64" {
+            mapCompiler["EXPORT_ARCH_ARGS"] = "-arch x86_64"
+        } else {
+            mapCompiler["EXPORT_ARCH_ARGS"] = "-arch i386"
+        }
+    }
+    delete(mapCompiler, "EXPORT_ACTIVE_ARCHS")
+
 	// Convert variable in compiler flags
 	for flagKey, flagValue := range mapCompiler {
 		variables := rxCompilerVar.FindAllString(flagValue, -1)
