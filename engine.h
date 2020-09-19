@@ -12,6 +12,8 @@ void* Engine_NewEngine();
 
 // Methods
 void Engine_Load(void* ptr, char* url);
+void Engine_AddImportPath(void* ptr, char* path);
+void Engine_AddPluginPath(void* ptr, char* path);
 void Engine_ClearComponentCache(void* ptr);
 
 #ifdef __cplusplus

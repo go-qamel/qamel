@@ -39,6 +39,26 @@ func (engine Engine) Load(url string) {
 	C.Engine_Load(engine.ptr, cURL)
 }
 
+func (engine Engine) AddImportPath(path string) {
+	if engine.ptr == nil {
+		return
+	}
+
+	cPath := C.CString(path)
+	defer C.free(unsafe.Pointer(cPath))
+	C.Engine_AddImportPath(engine.ptr, cPath)
+}
+
+func (engine Engine) AddPluginPath(path string) {
+	if engine.ptr == nil {
+		return
+	}
+
+	cPath := C.CString(path)
+	defer C.free(unsafe.Pointer(cPath))
+	C.Engine_AddPluginPath(engine.ptr, cPath)
+}
+
 // ClearComponentCache clears the engine's internal component cache. This function causes the property
 // metadata of all components previously loaded by the engine to be destroyed. All previously loaded
 // components and the property bindings for all extant objects created from those components will cease

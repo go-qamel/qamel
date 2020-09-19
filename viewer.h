@@ -16,6 +16,7 @@ extern "C" {
 
 // Constructor
 void* Viewer_NewViewer();
+void* Viewer_NewEngineViewer(void* ptr);
 
 // Methods
 void Viewer_SetSource(void* ptr, char* url);
