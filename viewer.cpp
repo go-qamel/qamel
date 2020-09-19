@@ -12,6 +12,7 @@ class QamelView : public QQuickView {
 
 public:
     QamelView(QWindow *parent = 0) : QQuickView(parent) {}
+    QamelView(QQmlEngine *engine, QWindow *parent = nullptr) : QQuickView(engine, parent) {}
     QamelView(const QUrl &source, QWindow *parent = nullptr) : QQuickView(source, parent) {}
 
 public slots:
@@ -23,6 +24,11 @@ public slots:
 
 void* Viewer_NewViewer() {
     return new QamelView();
+}
+
+void* Viewer_NewEngineViewer(void* ptr) {
+    QQmlEngine *engine = static_cast<QQmlEngine*>(ptr);
+    return new QamelView(engine);
 }
 
 void Viewer_SetSource(void* ptr, char* url) {

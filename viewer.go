@@ -29,6 +29,11 @@ func NewViewer() Viewer {
 	return Viewer{ptr: ptr}
 }
 
+func NewEngineViewer(engine Engine) Viewer {
+	ptr := C.Viewer_NewEngineViewer(engine.ptr)
+	return Viewer{ptr: ptr}
+}
+
 // NewViewerWithSource constructs a QQuickView with the given QML source.
 func NewViewerWithSource(source string) Viewer {
 	view := NewViewer()
