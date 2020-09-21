@@ -41,6 +41,15 @@ func NewViewerWithSource(source string) Viewer {
 	return view
 }
 
+func (view Viewer) Engine() *Engine {
+	if view.ptr == nil {
+		return nil
+	}
+
+	ptr := C.Viewer_GetEngine(view.ptr)
+	return &Engine{ptr: ptr}
+}
+
 // SetSource sets the source to the url, loads the QML component and instantiates it.
 // The source could be a Qt resource path (qrc://icon) or a file path (file://path/to/icon).
 // However, it must be a valid path.

@@ -31,6 +31,11 @@ void* Viewer_NewEngineViewer(void* ptr) {
     return new QamelView(engine);
 }
 
+void* Viewer_GetEngine(void* ptr) {
+    QamelView *view = static_cast<QamelView*>(ptr);
+    return view->engine();
+}
+
 void Viewer_SetSource(void* ptr, char* url) {
     QamelView *view = static_cast<QamelView*>(ptr);
     QMetaObject::invokeMethod(view, "setSource", Q_ARG(QUrl, QUrl(QString(url))));

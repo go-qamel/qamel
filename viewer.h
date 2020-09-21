@@ -19,6 +19,7 @@ void* Viewer_NewViewer();
 void* Viewer_NewEngineViewer(void* ptr);
 
 // Methods
+void* Viewer_GetEngine(void* ptr);
 void Viewer_SetSource(void* ptr, char* url);
 void Viewer_SetResizeMode(void* ptr, int resizeMode);
 void Viewer_SetFlags(void* ptr, int flags);
