@@ -29,11 +29,25 @@ func NewViewer() Viewer {
 	return Viewer{ptr: ptr}
 }
 
+func NewEngineViewer(engine Engine) Viewer {
+	ptr := C.Viewer_NewEngineViewer(engine.ptr)
+	return Viewer{ptr: ptr}
+}
+
 // NewViewerWithSource constructs a QQuickView with the given QML source.
 func NewViewerWithSource(source string) Viewer {
 	view := NewViewer()
 	view.SetSource(source)
 	return view
+}
+
+func (view Viewer) Engine() *Engine {
+	if view.ptr == nil {
+		return nil
+	}
+
+	ptr := C.Viewer_GetEngine(view.ptr)
+	return &Engine{ptr: ptr}
 }
 
 // SetSource sets the source to the url, loads the QML component and instantiates it.

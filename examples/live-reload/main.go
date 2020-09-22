@@ -14,7 +14,15 @@ func main() {
 	app.SetApplicationDisplayName("Live Reload Example")
 
 	// Create a QML viewer
-	view := qamel.NewViewerWithSource("res/main.qml")
+	// view := qamel.NewViewerWithSource("res/main.qml")
+	engine := qamel.NewEngine()
+	//$QT_DIR
+	//engine.AddImportPath("/Users/FlyingtimeICE/QT/Qt5.14.0/Examples/Qt-5.14.0/qml/qmlextensionplugins/imports")
+
+	// Create a QML viewer
+	view := qamel.NewEngineViewer(engine)
+	// view := qamel.NewViewer()
+	view.SetSource("res/main.qml")
 	view.SetResizeMode(qamel.SizeRootObjectToView)
 	view.SetHeight(300)
 	view.SetWidth(400)
