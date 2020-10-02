@@ -123,7 +123,7 @@ void Viewer_ShowNormal(void* ptr) {
 
 void Viewer_SetWindowStates(void* ptr, int state) {
     QamelView *view = static_cast<QamelView*>(ptr);
-    view->setWindowStates(Qt::WindowStates(state));
+    view->setWindowState(Qt::WindowState(state));
 }
 
 void Viewer_ClearComponentCache(void* ptr) {
