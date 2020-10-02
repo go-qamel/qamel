@@ -6,6 +6,7 @@
 #ifdef __cplusplus
 
 #include <QQmlEngine>
+#include <QtQml>
 #include <QAbstractListModel>
 #include <QVariant>
 #include <QHash>
