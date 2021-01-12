@@ -56,7 +56,7 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	// Fetch target architecture
 	fmt.Println()
 	fmt.Println("Please specify the target architecture for this profile. " +
-		`Possible values are "386" and "amd64".` + "\n" +
+		`Possible values are "386", "amd64", and "arm64".` + "\n" +
 		"Keep it empty to use your system architecture.")
 	fmt.Println()
 
@@ -68,7 +68,7 @@ func profileSetupHandler(cmd *cobra.Command, args []string) {
 	}
 
 	switch targetArch {
-	case "386", "amd64":
+	case "386", "amd64", "arm64":
 	default:
 		cRedBold.Printf("Architecture %s is not supported\n", targetArch)
 		os.Exit(1)
