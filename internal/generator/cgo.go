@@ -136,6 +136,8 @@ func createCgoFlags(profile config.Profile, projectDir string) (string, error) {
     if _, ok := mapCompiler["EXPORT_ARCH_ARGS"]; ok {
         if profile.Arch == "amd64" {
             mapCompiler["EXPORT_ARCH_ARGS"] = "-arch x86_64"
+        } else if profile.Arch == "arm64" {
+            mapCompiler["EXPORT_ARCH_ARGS"] = "-arch aarch64"
         } else {
             mapCompiler["EXPORT_ARCH_ARGS"] = "-arch i386"
         }
